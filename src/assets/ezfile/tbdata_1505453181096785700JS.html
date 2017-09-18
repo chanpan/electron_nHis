@@ -1,0 +1,101 @@
+<!--
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>-->
+<div id="registerScriptType"></div>
+<script>
+    
+
+    
+    let ezf_id = '"1505453181096785700"';
+    let url = "https://www.thaicarecloud.org/ezforms/ezform-service/get-ezform?ezf_id=1505453181096785700";
+    let url2 = "http://dpmcloud.dev/ezforms/ezform-service/get-ezform?ezf_id=1505453181096785700";
+    let ezfield_type=[];
+    
+    function getEzformType(){
+        var settings = {
+        "async": true,
+        "crossDomain": true,
+        "url": url2,
+        "method": "GET",
+        "headers": {
+          "x-token": "549968af6006a2fe6c016bf9070b4899",
+        }
+      }
+
+      $.ajax(settings).done(function (response) { 
+         $.each(response.ezfields, function(k,v){
+             if(v.ezf_field_type == 7){ 
+                 //date 
+                if(ezfield_type.indexOf(v.ezf_field_type) == -1){ //array_in -1 not found
+                   ezfield_type.push(v.ezf_field_type);
+                    $('#registerScriptType').append('<link rel="stylesheet" href="./assets/js/datepicker/datepicker.css" type="text/css" />');
+                    $("#registerScriptType").append(JQueryUi());
+                    $("#registerScriptType").append(JQueryBootstrapDatePicker()); 
+                    $("#registerScriptType").append(JQueryBootstrapDatePickerThai()); 
+                    $("#registerScriptType").append(JQueryBootstrapDatePickerTh()); 
+                    $("#registerScriptType").append(MaskInput());
+                    $("#registerScriptType").append(JQueryMaskInput()); 
+                    
+                    $("#sddynamicmodel-"+v.ezf_field_name).datepicker();
+                }
+             }
+            if(v.ezf_field_type == 1){
+                //text input
+                
+            } 
+             
+         });
+      });
+    }
+ 
+    function CreateElement(element){
+        return document.createElement(element);
+    }
+    function CreateElementType(){
+        return "text/javascript";
+    }
+    /********************************** JS Register****************************************/
+    function JQueryUi(){
+       var Ui = CreateElement("script");
+       Ui.type = CreateElementType();
+       Ui.src = "./assets/js/datepicker/jquery-ui.js";
+       return Ui;
+    }
+    function JQueryBootstrapDatePicker(){
+       var JQueryDatePicker = CreateElement("script");
+       JQueryDatePicker.type = CreateElementType();
+       JQueryDatePicker.src = "./assets/js/datepicker/bootstrap-datepicker.js";
+       return JQueryDatePicker;
+    }
+    function JQueryBootstrapDatePickerThai(){
+       var JQueryDatePicker = CreateElement("script");
+       JQueryDatePicker.type = CreateElementType();
+       JQueryDatePicker.src = "./assets/js/datepicker/bootstrap-datepicker-thai.js";
+       return JQueryDatePicker;
+    }
+    function JQueryBootstrapDatePickerTh(){
+       var JQueryDatePicker = CreateElement("script");
+       JQueryDatePicker.type = CreateElementType();
+       JQueryDatePicker.src = "./assets/js/datepicker/bootstrap-datepicker.th.js";
+       return JQueryDatePicker;
+    }
+    
+    function MaskInput(){
+       var Input = CreateElement("script");
+       Input.type = CreateElementType();
+       Input.src = "./assets/js/datepicker/inputmask.js";
+       return Input;
+    }
+    function JQueryMaskInput(){
+       var MaskInput = CreateElement("script");
+       MaskInput.type = CreateElementType();
+       MaskInput.src = "./assets/js/datepicker/jquery.inputmask.js";
+       return MaskInput;
+    }
+    /*create file*/
+    
+    
+    
+    
+    /*used*/
+    getEzformType();
+</script> 

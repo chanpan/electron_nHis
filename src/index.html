@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Electron Framework</title>
+	<link href="../node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="./assets/css/style.css" />
+	<link rel="stylesheet" href="./assets/font-awesome/css/font-awesome.min.css" />
+	<!-- JavaScript Core -->
+	<script>
+		window.$ = window.jQuery = require('./assets/js/jquery/jquery-2.1.4');
+	</script>
+	<script src="../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+</head>
+<body>
+	<div id="main-page"></div>
+	<!-- <script src="./assets/js/main.js"></script> -->
+	<script>
+		var Observable = require('rxjs/Observable').Observable;
+		require('rxjs/add/observable/of');
+		require('rxjs/add/operator/map');
+		var fs = require('fs');
+		function getUserDoc() {
+			return process.env.USERPROFILE+'\\Documents';
+		}
+		function createFolder(folderName){
+			
+			return new Observable(ob => {
+				var dir = getUserDoc() + "/" + folderName;
+				if (!fs.existsSync(dir)){
+					fs.mkdirSync(dir);
+				}
+				ob.next("success");
+			});
+			
+		}
+		function readFile(file){
+			var fs = require('fs');
+			return fs.readFileSync(file, 'utf8');
+		}
+		function copyFile(target, src){
+			return new Observable(ob => {
+				var fs = require('fs');
+				fs.writeFileSync(target, fs.readFileSync(src));
+				ob.next("success");
+			});
+		}
+
+		let target = getUserDoc() + "/ezforms/ezform.db";
+		let src = __dirname+"/assets/ezform_default.db";
+		
+		createFolder('ezforms').subscribe(
+			(next)=>{
+				console.log("Create folder ezforms success.");
+				copyFile(target,src).subscribe(
+					(res)=>{
+						console.log("Create file ezform.db success.");
+						require(__dirname+"/assets/js/main.js");
+					},err=>console.log("error")
+					);
+			},
+			(err)=>{console.log("error. ")}
+			); 
+		
+
+		</script>
+	</body>
+	</html>

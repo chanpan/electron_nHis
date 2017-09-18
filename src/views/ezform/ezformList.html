@@ -1,0 +1,158 @@
+<link href="./assets/js/select2/select2.min.css" rel="stylesheet" />
+
+<script src="./assets/js/select2/select2.full.js"></script>
+
+<div>
+	<h2>Ezform List</h2>
+	<div class="list-group">
+		<div id="app-ezform-list-search" class="container-fluid  ">
+			<div class="row">
+				<div class="col-md-6" style="padding:0;margin-bottom:10px;">
+					<div class="">
+						<select class="ezform-list-search form-control" name="state">
+							<option value="">ค้นหาร ezform</option>
+						</select>
+					</div><!-- /input-group -->
+				</div><!-- /.col-lg-6 -->
+			</div>
+		</div>
+		<div id="app-ezform-list"></div>
+	</div>
+</div>
+
+<div id="registerJsTmp"></div>
+<script>
+
+	let knexRemote01 = require('./assets/js/sql/knex-sqlite3.js');
+	var Observable = require('rxjs/Observable').Observable;
+	require('rxjs/add/observable/of');
+	require('rxjs/add/operator/map');
+
+	function onInit(){
+		$('.ezform-list-search').select2();
+		setEzformToSelect2();
+	}
+	function getFolders(){
+		return process.env.USERPROFILE+'\\Documents';
+	}
+	$(".ezform-list-search").on("change",function(){
+		let ezf_id = $(this).val();
+		if(ezf_id != ""){
+			getEzformListByid(ezf_id);
+		}else{
+			getEzformListAll();
+		}
+	});
+	$("#btnGetForm").on("click",function(){
+		let ezf_id = $("#ezf_id").val();
+		getEzformById(ezf_id,1);
+		getEzformById(ezf_id,2);
+		getEzformById(ezf_id,3);
+	});
+
+	function getEzformById(ezf_id, status){
+		let url="http://dpmcloud.dev/site/ezform-print?comp_id_target=&ezf_id="+ezf_id+"&target=skip&dataid=0&status="+status;
+		$.ajax({
+			beforeSend:function(data){
+				$("#app-ezform-list").html("กำลังโหลดข้อมูล ...");
+			},
+			url:url,
+			success:function(data){
+				if(status == 1){
+					//Load resources from the server.
+					console.log("status = 1");
+					$("#registerJsTmp").html(data); //สั่งให้ script จาก server ทำงาน 
+				}
+				if(status == 2){
+					//Load JavaScript from the server
+					console.log("status = 2");
+					CreateFile(data, 'tbdata_'+ezf_id+"JS").subscribe(res=>console.log(res),err=>console.log(err));
+				}
+				if(status == 3){
+					//Load EzformField from the server
+					CreateFile(data, 'tbdata_'+ezf_id).subscribe(res=>console.log(res),err=>console.log(err));
+					console.log("status = 2");
+				}
+				getEzformListAll();
+			}
+		});
+	}
+	/*create file */
+	function CreateFile(data, fileName){
+		const fs = require("fs");
+		let pathName = getFolders()+"/ezforms/"+fileName+".html";
+		return new Observable(ob => {
+			fs.writeFile(pathName,data, function(err){
+				if(err) ob.error(err)
+					ob.next("บันทึกไฟล์เรียบร้อย");            
+			});  
+		});  
+	}
+
+	function setEzformToSelect2(){
+		knexRemote01.knexfindAll('ezform_search').subscribe(
+			(res)=>{
+				let options = "";
+				options += "<option value='"+res.ezf_id+"'>"+res.ezf_name+"</option>";
+				$('.ezform-list-search').append(options);
+			},
+			(err)=>ezformSearchListShowDataError(err)
+			);
+	}
+	function getEzformListAll(){
+		ezformClear();
+		knexRemote01.knexfindAll('ezform_search').subscribe(
+			(res)=>{
+
+				let html = "";
+				html += `
+				<a href="#" onclick='loadEzform(${res.ezf_id})' class="list-group-item">
+					<h4 class="list-group-item-heading">${res.ezf_name}</h4>
+					<p class="list-group-item-text">${res.ezf_id}</p>
+				</a>
+				`;
+				$("#app-ezform-list").append(html);
+			},
+			(err)=>ezformSearchListShowDataError(err)
+			);
+	}
+	function getEzformListByid(ezf_id){
+		ezformClear();
+		knexRemote01.knexfindById('ezform_search',{ezf_id:ezf_id}).subscribe(
+			(res)=>{
+				let html = "";
+				html += `
+				<a href="#" onclick='loadEzform(${res.ezf_id})' class="list-group-item">
+					<h4 class="list-group-item-heading">${res.ezf_name}</h4>
+					<p class="list-group-item-text">${res.ezf_id}</p>
+				</a>
+				`;
+				$("#app-ezform-list").append(html);
+			},
+			(err)=>ezformSearchListShowDataError(err)
+			);
+	}
+	function ezformSearchListShowDataError(err){
+		let msgs = "";	
+		msgs += "<div class='alert alert-danger'>";
+		msgs += err;
+		msgs += "</div>"
+		$('#app-ezform-list').html(msgs); 
+		$(selector).append(html);
+	}
+	function ezformClear(){
+		$("#app-ezform-list").html("");
+	}
+
+	function loadEzform(ezf_id){
+		const remote = require("electron").remote;
+		const main = remote.require('./main.js');
+		var window = remote.getCurrentWindow();
+		main.childWindow(ezf_id);
+
+	}
+
+	onInit();
+	getEzformListAll();
+</script>
+

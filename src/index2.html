@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Electron Framework</title>
+	<link href="../node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="./assets/css/style.css" />
+	<link rel="stylesheet" href="./assets/font-awesome/css/font-awesome.min.css" />
+	<!-- JavaScript Core -->
+	<script>
+		window.$ = window.jQuery = require('./assets/js/jquery/jquery-2.1.4');
+	</script>
+	<script src="../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+</head>
+<body>
+	<div class="container-fluid">
+		<div class="">
+			<div class="panel panel-primary">
+				<div class="panel-heading" style="padding: 10px;">
+					<h5 class="box-title" style="font-size: 18px;"><i class="fa fa-pencil-square-o"></i> แก้ไขข้อมูลเดิม</h5>
+				</div>
+				<div class="panel-body">
+					<h1 id="panelTitle"></h1>
+					<hr style="border: 2px solid #333;">
+				</div>
+			</div>
+		</div>
+	</div>
+	<script>
+		let knexRemote02 = require('./assets/js/sql/knex-sqlite3.js');
+		let ezf_id = getQueryStringValue("ezf_id"); 
+		getEzformName(ezf_id);
+		function getQueryStringValue (key) {  
+			return decodeURIComponent(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + encodeURIComponent(key).replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));  
+		}
+		function getEzformName(ezf_id){
+			knexRemote02.knexfindById("ezform_search",{ezf_id:ezf_id}).subscribe(
+				(res)=>{
+					$("#panelTitle").html(res.ezf_name);
+				},
+				(err)=>console.log(err)
+				);
+		}
+
+
+	</script>
+</body>
+</html>
