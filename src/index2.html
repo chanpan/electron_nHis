@@ -27,23 +27,47 @@
 			</div>
 		</div>
 	</div>
+	
 	<script>
-		let knexRemote02 = require('./assets/js/sql/knex-sqlite3.js');
-		let ezf_id = getQueryStringValue("ezf_id"); 
-		getEzformName(ezf_id);
-		function getQueryStringValue (key) {  
-			return decodeURIComponent(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + encodeURIComponent(key).replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));  
-		}
-		function getEzformName(ezf_id){
-			knexRemote02.knexfindById("ezform_search",{ezf_id:ezf_id}).subscribe(
-				(res)=>{
-					$("#panelTitle").html(res.ezf_name);
+		index2LoadScript();
+		function index2LoadScript(){
+			console.log("index2LoadScript");
+			let url = getUserDoc()+"/ezforms/tbdata_1505453181096785700JS.html";
+			$.ajax({
+				url:url,
+				success:function(data){
+					console.log("success");
+					$("#demos").append("OK");
+					$("#demos").html(data);
 				},
-				(err)=>console.log(err)
-				);
+				error:function(err){
+					console.log("error");
+					$("#demos").html(err);
+				}
+			});
 		}
+		function getUserDoc() {
+			return process.env.USERPROFILE+'\\Documents';
+		}
+		
+
+		// let knexRemote02 = require('./assets/js/sql/knex-sqlite3.js');
+		// let ezf_id = getQueryStringValue("ezf_id"); 
+		// getEzformName(ezf_id);
+		// function getQueryStringValue (key) {  
+		// 	return decodeURIComponent(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + encodeURIComponent(key).replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));  
+		// }
+		// function getEzformName(ezf_id){
+		// 	knexRemote02.knexfindById("ezform_search",{ezf_id:ezf_id}).subscribe(
+		// 		(res)=>{
+		// 			$("#panelTitle").html(res.ezf_name);
+		// 		},
+		// 		(err)=>console.log(err)
+		// 		);
+		// }
 
 
 	</script>
+	<div id="demos">asdfghjkl;'</div>
 </body>
 </html>
