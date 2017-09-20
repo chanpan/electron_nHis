@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,8 +13,14 @@
 		window.$ = window.jQuery = require('./assets/js/jquery/jquery-2.1.4');
 	</script>
 	<script src="../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
-</head>
+	<script src="./assets/js/jquery-ui.js"></script>
+
+ </head>
+
 <body>
+	<div id="Index2registerScript">
+		 
+	</div>
 	<div class="container-fluid">
 		<div class="">
 			<div class="panel panel-primary">
@@ -23,51 +30,67 @@
 				<div class="panel-body">
 					<h1 id="panelTitle"></h1>
 					<hr style="border: 2px solid #333;">
+					<div id="Index2Ezform"></div>
 				</div>
 			</div>
 		</div>
 	</div>
-	
+
+
 	<script>
-		index2LoadScript();
-		function index2LoadScript(){
-			console.log("index2LoadScript");
-			let url = getUserDoc()+"/ezforms/tbdata_1505453181096785700JS.html";
+		 
+		
+		setTimeout(function(){
+			index2LoadScript();
+			
+		},1000);
+		Index2LoadTemplateEzform();
+		
+		function index2LoadScript(ezf_id="") {
+			$("#Index2registerScript").html("");
+			let url = getUserDoc() + "/ezforms/tbdata_1505453181096785700JS.html";
 			$.ajax({
-				url:url,
-				success:function(data){
-					console.log("success");
-					$("#demos").append("OK");
-					$("#demos").html(data);
+				url: url,
+				success: function (data) {
+					$("#Index2registerScript").html(data);
 				},
-				error:function(err){
-					console.log("error");
-					$("#demos").html(err);
+				error: function (err) {
+					$("#Index2registerScript").html(err);
+				}
+			});
+		}
+		function Index2LoadTemplateEzform(ezf_id=""){
+			let url = getUserDoc() + "/ezforms/tbdata_1505453181096785700.html";
+			$.ajax({
+				url: url,
+				success: function (data) {
+					$("#Index2Ezform").html(data);
+				},
+				error: function (err) {
+					$("#Index2Ezform").html(err);
 				}
 			});
 		}
 		function getUserDoc() {
-			return process.env.USERPROFILE+'\\Documents';
+			return process.env.USERPROFILE + '\\Documents';
 		}
+		let knexRemote02 = require('./assets/js/sql/knex-sqlite3.js');
+		let ezf_id = getQueryStringValue("ezf_id"); 
+		getEzformName(ezf_id);
 		
-
-		// let knexRemote02 = require('./assets/js/sql/knex-sqlite3.js');
-		// let ezf_id = getQueryStringValue("ezf_id"); 
-		// getEzformName(ezf_id);
-		// function getQueryStringValue (key) {  
-		// 	return decodeURIComponent(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + encodeURIComponent(key).replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));  
-		// }
-		// function getEzformName(ezf_id){
-		// 	knexRemote02.knexfindById("ezform_search",{ezf_id:ezf_id}).subscribe(
-		// 		(res)=>{
-		// 			$("#panelTitle").html(res.ezf_name);
-		// 		},
-		// 		(err)=>console.log(err)
-		// 		);
-		// }
-
-
+		function getQueryStringValue (key) {  
+			return decodeURIComponent(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + encodeURIComponent(key).replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));  
+		}
+		function getEzformName(ezf_id){
+			knexRemote02.knexfindById("ezform_search",{ezf_id:ezf_id}).subscribe(
+				(res)=>{
+					$("#panelTitle").html(res.ezf_name);
+				},
+				(err)=>console.log(err)
+				);
+		}
 	</script>
-	<div id="demos">asdfghjkl;'</div>
+
 </body>
+
 </html>

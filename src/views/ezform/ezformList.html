@@ -10,7 +10,7 @@
 				<div class="col-md-6" style="padding:0;margin-bottom:10px;">
 					<div class="">
 						<select class="ezform-list-search form-control" name="state">
-							<option value="">ค้นหาร ezform</option>
+							<option value="">ค้นหา ezform</option>
 						</select>
 					</div><!-- /input-group -->
 				</div><!-- /.col-lg-6 -->
@@ -45,13 +45,16 @@
 	});
 	$("#btnGetForm").on("click",function(){
 		let ezf_id = $("#ezf_id").val();
+
 		getEzformById(ezf_id,1);
 		getEzformById(ezf_id,2);
 		getEzformById(ezf_id,3);
 	});
 
 	function getEzformById(ezf_id, status){
-		let url="http://dpmcloud.dev/site/ezform-print?comp_id_target=&ezf_id="+ezf_id+"&target=skip&dataid=0&status="+status;
+		let url="";//"http://dpmcloud.dev/site/ezform-print?comp_id_target=&ezf_id="+ezf_id+"&target=skip&dataid=0&status="+status;
+		url="https://www.thaicarecloud.org/site/ezform-print?comp_id_target=&ezf_id="+ezf_id+"&target=skip&dataid=0&status="+status;
+		console.log(url);
 		$.ajax({
 			beforeSend:function(data){
 				$("#app-ezform-list").html("กำลังโหลดข้อมูล ...");
