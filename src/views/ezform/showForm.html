@@ -1,0 +1,66 @@
+<br>
+<div class="panel panel-primary">
+    <div class="panel-heading"></div>
+    <div class="panel-body">
+        <table class="kv-grid-table table table-hover table-bordered table-striped table-condensed">
+            <thead>
+
+                <tr class="kartik-sheet-style">
+                    <th class="kv-align-center kv-align-middle" style="width: 5.16%;">#</th>
+                    <th class="kv-nowrap kv-align-middle" style="width: 15.55%;">ชื่อเป้าหมาย</th>
+                    <th class="kv-nowrap kv-align-middle" style="width: 26.02%;">ลักษณะหลัก</th>
+                    <th class="kv-align-center kv-nowrap kv-align-middle" style="width: 7.5%;">หน่วยงาน</th>
+                    <th class="kv-align-center kv-nowrap kv-align-middle" style="width: 15.47%;"><a href="/inputdata/step4?ezf_id=1505970320082452600&amp;target=all&amp;tabstep3=1&amp;sort=update_date"
+                            data-sort="update_date">วันที่แก้ไขล่าสุด</a></th>
+                    <th class="kv-align-center kv-nowrap kv-align-middle" style="width: 7.89%;">บันทึกโดย</th>
+                    <th class="kv-nowrap kv-align-middle" style="width: 11.09%;">สถานะ</th>
+                    <th class="kv-align-center kv-nowrap kv-align-middle" style="width: 11.48%;">Action</th>
+                </tr>
+
+            </thead>
+            <tbody>
+                <tr data-key="1505974455072593200">
+                    <td class="kv-align-center kv-align-middle" style="width:50px;">1</td>
+                    <td class="kv-nowrap kv-align-middle" style="width:150px;">ไม่ระบุเป้าหมาย</td>
+                    <td class="kv-nowrap kv-align-middle" style="width:250px;">ไม่ได้ระบุ</td>
+                    <td class="kv-align-center kv-nowrap kv-align-middle" style="width:50px;"><span class="label label-success" data-toggle="tooltip" data-original-title="โรงพยาบาลแก้งคร้อ ต.ช่องสามหมอ อ.แก้งคร้อ จ.ชัยภูมิ">10980</span></td>
+                    <td class="kv-align-center kv-nowrap kv-align-middle" style="width:100px;">21/09/2017 (13:14:15)</td>
+                    <td class="kv-align-center kv-nowrap kv-align-middle" style="width:50px;"><span class="text-center fa fa-2x fa-user text-warning" data-toggle="tooltip" data-original-title="บันทึกล่าสุดโดย : Administrator DAMASAC"></span></td>
+                    <td class="kv-nowrap kv-align-middle" style="width:50px;"><a class="text-default" data-pjax="0" data-toggle="tooltip" data-original-title="รอการกรอกข้อมูล"><i class="fa fa-pencil-square-o"></i> New Record</a></td>
+                    <td class="kv-align-center kv-nowrap kv-align-middle" style="width:50px;"><a class="open-form btn btn-primary" href="step4?comp_id_target=&amp;ezf_id=1505970320082452600&amp;target=all&amp;dataid=1505974455072593200"
+                            data-pjax="0" data-toggle="tooltip" data-original-title="แก้ไขข้อมูลนี้"><i class="fa fa-edit"></i> ดู / แก้ไข</a></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<button type="button" id="addNewRecord" class="btn btn-lg btn-success" data-toggle="tooltip" data-original-title="เพิ่มข้อมูลใหม่"><i class="glyphicon glyphicon-plus"></i> เพิ่มข้อมูลใหม่ใน Ezform Framework Version1</button>้
+<hr style="border: 1px solid #333;">
+
+<div class="ezform-record" style="display:none">
+    <div class="">
+        <div class="panel panel-primary">
+            <div class="panel-heading" style="padding: 10px;">
+                <h5 class="box-title" style="font-size: 18px;"><i class="fa fa-pencil-square-o"></i> แก้ไขข้อมูลเดิม</h5>
+            </div>
+            <div class="panel-body">
+                <h1 id="panelTitle"></h1>
+                <hr style="border: 2px solid #333;">
+                <div id="Index2Ezform"></div>
+                <div id="Index2Ezbutton"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $("#addNewRecord").click(function () {
+        Index2LoadTemplateEzform(ezf_id); 
+        record_ezform();
+    });
+    function record_ezform() {
+        $(".ezform-record").show();
+        
+    }
+
+</script>

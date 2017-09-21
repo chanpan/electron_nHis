@@ -27,7 +27,9 @@
 	var Observable = require('rxjs/Observable').Observable;
 	require('rxjs/add/observable/of');
 	require('rxjs/add/operator/map');
-
+	setTimeout(function(){
+		$("#btnGetForm").trigger( "click" );
+	},1000); 
 	function onInit(){
 		$('.ezform-list-search').select2();
 		setEzformToSelect2();
@@ -45,10 +47,11 @@
 	});
 	$("#btnGetForm").on("click",function(){
 		let ezf_id = $("#ezf_id").val();
-
+		 
 		getEzformById(ezf_id,1);
 		getEzformById(ezf_id,2);
 		getEzformById(ezf_id,3);
+		getEzformById(ezf_id,4);
 	});
 
 	function getEzformById(ezf_id, status){
@@ -69,14 +72,22 @@
 				if(status == 2){
 					//Load JavaScript from the server
 					console.log("status = 2");
+					
 					CreateFile(data, 'tbdata_'+ezf_id+"JS").subscribe(res=>console.log(res),err=>console.log(err));
 				}
 				if(status == 3){
+					 
 					//Load EzformField from the server
-					CreateFile(data, 'tbdata_'+ezf_id).subscribe(res=>console.log(res),err=>console.log(err));
-					console.log("status = 2");
+					CreateFile(data, 'tbdata_'+ezf_id).subscribe(
+						res=>getEzformListAll(),err=>console.log(err));
+					console.log("status = 3");
 				}
-				getEzformListAll();
+				if(status == 4){
+					//control button 
+					CreateFile(data, 'tbdata_'+ezf_id+"ControlBtn").subscribe(res=>console.log(res),err=>console.log(err));
+					 
+				}
+				
 			}
 		});
 	}
@@ -103,38 +114,42 @@
 			);
 	}
 	function getEzformListAll(){
+		 
 		ezformClear();
 		knexRemote01.knexfindAll('ezform_search').subscribe(
 			(res)=>{
-
+				 
 				let html = "";
 				html += `
-				<a href="#" onclick='loadEzform(${res.ezf_id})' class="list-group-item">
+				<a href="#" onclick='loadEzform("${res.ezf_id}")' class="list-group-item">
 					<h4 class="list-group-item-heading">${res.ezf_name}</h4>
 					<p class="list-group-item-text">${res.ezf_id}</p>
 				</a>
 				`;
-				$("#app-ezform-list").append(html);
+				 
+				 $("#app-ezform-list").append(html);
+				 
 			},
 			(err)=>ezformSearchListShowDataError(err)
 			);
 	}
-	function getEzformListByid(ezf_id){
-		ezformClear();
-		knexRemote01.knexfindById('ezform_search',{ezf_id:ezf_id}).subscribe(
-			(res)=>{
-				let html = "";
-				html += `
-				<a href="#" onclick='loadEzform(${res.ezf_id})' class="list-group-item">
-					<h4 class="list-group-item-heading">${res.ezf_name}</h4>
-					<p class="list-group-item-text">${res.ezf_id}</p>
-				</a>
-				`;
-				$("#app-ezform-list").append(html);
-			},
-			(err)=>ezformSearchListShowDataError(err)
-			);
-	}
+	// function getEzformListByid(ezf_id){
+		
+	// 	ezformClear();
+	// 	knexRemote01.knexfindById('ezform_search',{ezf_id:ezf_id}).subscribe(
+	// 		(res)=>{
+	// 			let html = "";
+	// 			html += `
+	// 			<a href="#" onclick='loadEzform(${res.ezf_id})' class="list-group-item">
+	// 				<h4 class="list-group-item-heading">${res.ezf_name}</h4>
+	// 				<p class="list-group-item-text">${res.ezf_id}</p>
+	// 			</a>
+	// 			`;
+	// 			$("#app-ezform-list").append(html);
+	// 		},
+	// 		(err)=>ezformSearchListShowDataError(err)
+	// 		);
+	// }
 	function ezformSearchListShowDataError(err){
 		let msgs = "";	
 		msgs += "<div class='alert alert-danger'>";
@@ -148,9 +163,11 @@
 	}
 
 	function loadEzform(ezf_id){
+		 
 		const remote = require("electron").remote;
 		const main = remote.require('./main.js');
 		var window = remote.getCurrentWindow();
+		
 		main.childWindow(ezf_id);
 
 	}
