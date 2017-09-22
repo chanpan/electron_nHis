@@ -77,6 +77,11 @@ exports.knexInsertColumToLocal = (table,data) => {
   return knex.insert(data).into(table);
 }
 
+//////////////////////////////////////////////////// update table =///////////////////////////////////////////////////////
+exports.knexUpdateColumToLocal = (table,data,primary) => {
+  return knex(table).where(primary).update(data);
+}
+
 exports.knexfindAll = (table)=>{
   return new Observable(ob => {
     knex.select('*').from(table).map(row=>ob.next(row)).catch(err=>ob.error(err));
@@ -89,6 +94,16 @@ exports.knexfindById = (table,params)=>{
   });
 }
 
+
+exports.knexfindById2 = async (table,params)=>{
+  
+    return await knex.select('*')
+    .from(table)
+    .where(params)
+    .map(row=>row =row).catch(err=>console.log(err));
+  
+   
+}
 
 
 

@@ -6,30 +6,16 @@
             <thead>
 
                 <tr class="kartik-sheet-style">
-                    <th class="kv-align-center kv-align-middle" style="width: 5.16%;">#</th>
-                    <th class="kv-nowrap kv-align-middle" style="width: 15.55%;">ชื่อเป้าหมาย</th>
-                    <th class="kv-nowrap kv-align-middle" style="width: 26.02%;">ลักษณะหลัก</th>
-                    <th class="kv-align-center kv-nowrap kv-align-middle" style="width: 7.5%;">หน่วยงาน</th>
-                    <th class="kv-align-center kv-nowrap kv-align-middle" style="width: 15.47%;"><a href="/inputdata/step4?ezf_id=1505970320082452600&amp;target=all&amp;tabstep3=1&amp;sort=update_date"
-                            data-sort="update_date">วันที่แก้ไขล่าสุด</a></th>
-                    <th class="kv-align-center kv-nowrap kv-align-middle" style="width: 7.89%;">บันทึกโดย</th>
-                    <th class="kv-nowrap kv-align-middle" style="width: 11.09%;">สถานะ</th>
-                    <th class="kv-align-center kv-nowrap kv-align-middle" style="width: 11.48%;">Action</th>
+                    <th>ชื่อเป้าหมาย</th>
+                    <th>ลักษณะหลัก</th>
+                    <th>หน่วยงาน</th>
+                    <th><a href="">วันที่แก้ไขล่าสุด</a></th>
+                    <th>Action</th>
                 </tr>
 
             </thead>
-            <tbody>
-                <tr data-key="1505974455072593200">
-                    <td class="kv-align-center kv-align-middle" style="width:50px;">1</td>
-                    <td class="kv-nowrap kv-align-middle" style="width:150px;">ไม่ระบุเป้าหมาย</td>
-                    <td class="kv-nowrap kv-align-middle" style="width:250px;">ไม่ได้ระบุ</td>
-                    <td class="kv-align-center kv-nowrap kv-align-middle" style="width:50px;"><span class="label label-success" data-toggle="tooltip" data-original-title="โรงพยาบาลแก้งคร้อ ต.ช่องสามหมอ อ.แก้งคร้อ จ.ชัยภูมิ">10980</span></td>
-                    <td class="kv-align-center kv-nowrap kv-align-middle" style="width:100px;">21/09/2017 (13:14:15)</td>
-                    <td class="kv-align-center kv-nowrap kv-align-middle" style="width:50px;"><span class="text-center fa fa-2x fa-user text-warning" data-toggle="tooltip" data-original-title="บันทึกล่าสุดโดย : Administrator DAMASAC"></span></td>
-                    <td class="kv-nowrap kv-align-middle" style="width:50px;"><a class="text-default" data-pjax="0" data-toggle="tooltip" data-original-title="รอการกรอกข้อมูล"><i class="fa fa-pencil-square-o"></i> New Record</a></td>
-                    <td class="kv-align-center kv-nowrap kv-align-middle" style="width:50px;"><a class="open-form btn btn-primary" href="step4?comp_id_target=&amp;ezf_id=1505970320082452600&amp;target=all&amp;dataid=1505974455072593200"
-                            data-pjax="0" data-toggle="tooltip" data-original-title="แก้ไขข้อมูลนี้"><i class="fa fa-edit"></i> ดู / แก้ไข</a></td>
-                </tr>
+            <tbody id="tbody">
+
             </tbody>
         </table>
     </div>
@@ -46,6 +32,10 @@
             <div class="panel-body">
                 <h1 id="panelTitle"></h1>
                 <hr style="border: 2px solid #333;">
+                <div>
+                    <input type="text" class="form-control" id="updateID">
+                    <input type="text" class="form-control" id="updateTABLE">
+                </div>
                 <div id="Index2Ezform"></div>
                 <div id="Index2Ezbutton"></div>
             </div>
@@ -54,13 +44,104 @@
 </div>
 
 <script>
+    let knexRemote = require('./assets/js/sql/knex-sqlite3.js');
     $("#addNewRecord").click(function () {
-        Index2LoadTemplateEzform(ezf_id); 
+        let id = myID();
+        let data = {};
+        data['id'] = id;
+        GetEzformSearch(ezf_id).then((row) => {//
+            knexRemote.knexInsertColumToLocal(row[0].ezf_table, data)
+                .then((res) => {
+                    $("#updateID").val(id);
+                    $("#updateTABLE").val(row[0].ezf_table);
+                    LoadForm(ezf_id);
+                });
+        });
+
+    });
+
+    //GetEzformSearch(ezf_id);
+    async function GetEzformSearch(ezf_id, table = "") {
+        if (table == "") {
+            table = "ezform_search";
+        }
+        return await knexRemote.knexfindById2(table, { ezf_id: ezf_id });
+        // data.then(res=>{
+        //     LoadForm(res[0].ezf_table);
+        // });
+    }
+    LoadForm(ezf_id);
+    function LoadForm(ezf_id = '') {
+        $("#tbody").html('');
+        GetEzformSearch(ezf_id)
+            .then((res) => {
+                knexRemote.knexfindAll(res[0].ezf_table).subscribe((response) => {
+                    // console.log(response);
+                    let tbody = `
+                    <tr>
+                        <td>ไม่มีเป้าหมาย</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td> <button onclick='UpdateForm("${ezf_id}","${res[0].ezf_table}","${response.id}")' class='open-form btn btn-primary'><i class='fa fa-edit'></i>  ดู / แก้ไข</button>
+                        </td>    
+                    </tr>    
+                `;
+                    $("#tbody").append(tbody);
+                });
+            });
+
+    }
+    $("#addNewRecord").click(function () {
+
         record_ezform();
     });
     function record_ezform() {
+        Index2LoadTemplateEzform(ezf_id);
         $(".ezform-record").show();
-        
+
+    }
+    function UpdateForm(ezf_id, table, id) {
+        $("#updateID").val(id);
+        $("#updateTABLE").val(table);
+        record_ezform();
+        //console.log("OK " + table);
+        knexRemote.knexfindById(table, { id: id }).subscribe(
+            (row) => {
+
+                knexRemote.knexfindById("ezform_fields", { ezf_id: ezf_id }).subscribe((res) => {
+                    var arr = [];
+                        for (var key in row) {
+                            if (row.hasOwnProperty(key)) {
+                                arr[key] = row[key]
+                            }
+                        };
+                    if (res.ezf_field_type == 1) {
+                        $("#sddynamicmodel-"+res.ezf_field_name).val(arr[res.ezf_field_name]); 
+                    }
+                    if(res.ezf_field_type == 23){
+                        var radios = $("#sddynamicmodel-"+res.ezf_field_name);
+                        console.log(radios);
+                            if(radios.is(':checked') === false) {
+                                radios.filter('[value='+arr[res.ezf_field_name]+']').prop('checked', true);
+                        }
+                    }
+                })
+
+            },
+            (err) => { console.log(err) }
+        );
+
+
+    }
+    function myID() {
+        var n = Date.now();
+        let val = n * 1000;
+        return n + giveValues();
+    }
+    function giveValues() {
+        var number = Math.round((Math.random() * 999999999));
+        return number.toString().substr(0, 4);
     }
 
 </script>
