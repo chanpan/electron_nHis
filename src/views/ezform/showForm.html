@@ -33,8 +33,8 @@
                 <h1 id="panelTitle"></h1>
                 <hr style="border: 2px solid #333;">
                 <div>
-                    <input type="hidden" class="form-control" id="updateID">
-                    <input type="hidden" class="form-control" id="updateTABLE">
+                    <input type="text" class="form-control" id="updateID">
+                    <input type="text" class="form-control" id="updateTABLE">
                 </div>
                 <div id="Index2Ezform"></div>
                 <div id="Index2Ezbutton"></div>
@@ -112,21 +112,25 @@
         }, err => console.log(err));
     }
     function UpdateForm(ezf_id, table, id) {
-        $("#updateID").val(id);
-        $("#updateTABLE").val(table);
-        record_ezform();
-        //console.log("OK " + table);
+         record_ezform();
+         $("#updateID").val(id);
+         $("#updateTABLE").val(table);
+       
+
+ 
+		
+
         knexRemote.knexfindById(table, { id: id }).subscribe(
             (row) => {
 
-                knexRemote.knexfindById("ezform_fields", { ezf_id: ezf_id }).subscribe((res) => {
+                knexRemote.knexfindById("ezform_fields", { ezf_id: ezf_id}).subscribe((res) => {
                     var arr = [];
                     for (var key in row) {
                         if (row.hasOwnProperty(key)) {
                             arr[key] = row[key]
                         }
                     };
-
+                   // console.log(res);
                     if (res.ezf_field_type == 1 || res.ezf_field_type == 3 || res.ezf_field_type == 12 || res.ezf_field_type == 7 || res.ezf_field_type == 8 || res.ezf_field_type == 9) {
                         if (res.ezf_field_type == 3) {
                             $('.field-sddynamicmodel-' + res.ezf_field_name + ' .redactor-box .redactor-editor').append(arr[res.ezf_field_name]);
@@ -139,14 +143,7 @@
                     }
                     if (res.ezf_field_type == 14) {
                         //file upload
-                        var formidable = require('formidable');
-                        if (req.url == './assets/image') {
-                            var form = new formidable.IncomingForm();
-                            form.parse(req, function (err, fields, files) {
-                                res.write('File uploaded');
-                                res.end();
-                            });
-                        } else { }
+                         
                     }
                     if (res.ezf_field_type == 17) {
                         //all hospital list
@@ -213,6 +210,7 @@
                         );
                     }
                     if (res.ezf_field_type == 25) {//Grid
+                        console.log("Grid");
                         //ezf_field_sub_id
                         knexRemote.knexfindById("ezform_fields", { ezf_field_sub_id: res.ezf_field_id }).subscribe(
                             (res2) => {
@@ -235,7 +233,20 @@
                             },
                             (err) => console.log(err)
                         );
+                    }//grid
+
+                    if (res.ezf_field_type == 26) {
+                        //Google Maps
+                        console.log("Google Maps");
+                        let var_google_map = res2.ezf_field_name;
+                        knexRemote.knexfindById("ezform_fields", { ezf_field_sub_id: res.ezf_field_id }).subscribe((res2)=>{
+                            console.log(res2.ezf_field_name);
+                        });
+                         
                     }
+                    
+                    
+                    
                 });
 
             },
