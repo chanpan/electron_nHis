@@ -101,6 +101,11 @@ exports.knexfindById = (table,params)=>{
     knex.select('*').from(table).where(params).map(row=>ob.next(row)).catch(err=>ob.error(err));
   });
 }
+exports.getHospital = (hcodes)=>{
+  return new Observable(ob =>{
+    knex('all_hospital_thai').where('hcode', 'like', '%'+hcodes+'%').map(row=>ob.next(row)).catch(err=>ob.error(err));
+  });
+}
 
 
 exports.knexfindById2 = async (table,params)=>{

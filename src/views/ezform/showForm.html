@@ -43,6 +43,10 @@
     </div>
 </div>
 
+
+
+
+
 <script>
     let knexRemote = require('./assets/js/sql/knex-sqlite3.js');
     $("#addNewRecord").click(function () {
@@ -101,36 +105,49 @@
         $(".ezform-record").show();
 
     }
-    function GetAllHospital(selects="", hcodes="") {
-         
-        // let selects =$("#"+selects).val();
-        knexRemote.knexfindById("all_hospital_thai", {hcode:hcodes}).subscribe((res3) => {
-            $("#"+selects).append(`
-              <option value='${res3.hcode}'>${res3.name}</option>
-            `);
+    function GetAllHospital(selects = "", hcodes = "") {
 
-        }, err => console.log(err));
+        // let selects =$("#"+selects).val(); knex('users').where('columnName', 'like', '%rowlikeme%')
+        //'select * from users where id in (?)', [[1, 2, 3]]
+        // let url = __dirname + "./assets/ezfile/all_hospital_thai.json";
+        // $.ajax({
+        //     url: url,
+        //     dataType: 'json',
+        //     success: function (data) {
+        //         console.log(data);
+        //     }
+        // })
+        // knexRemote.getHospital(hcodes).subscribe((res3) => {
+        //     $("#"+selects).append(`
+        //       <option value='${res3.hcode}'>${res3.name}</option>
+        //     `);
+        // });
+        // let wheres = "";
+        // knexRemote.knexfindById("all_hospital_thai", {hcode:hcodes}).subscribe((res3) => {
+        //     
+
+        // }, err => console.log(err));
     }
     function UpdateForm(ezf_id, table, id) {
-         record_ezform();
-         $("#updateID").val(id);
-         $("#updateTABLE").val(table);
-       
+        record_ezform();
+        $("#updateID").val(id);
+        $("#updateTABLE").val(table);
 
- 
-		
+
+
+
 
         knexRemote.knexfindById(table, { id: id }).subscribe(
             (row) => {
 
-                knexRemote.knexfindById("ezform_fields", { ezf_id: ezf_id}).subscribe((res) => {
+                knexRemote.knexfindById("ezform_fields", { ezf_id: ezf_id }).subscribe((res) => {
                     var arr = [];
                     for (var key in row) {
                         if (row.hasOwnProperty(key)) {
                             arr[key] = row[key]
                         }
                     };
-                   // console.log(res);
+                    // console.log(res);
                     if (res.ezf_field_type == 1 || res.ezf_field_type == 3 || res.ezf_field_type == 12 || res.ezf_field_type == 7 || res.ezf_field_type == 8 || res.ezf_field_type == 9) {
                         if (res.ezf_field_type == 3) {
                             $('.field-sddynamicmodel-' + res.ezf_field_name + ' .redactor-box .redactor-editor').append(arr[res.ezf_field_name]);
@@ -143,37 +160,80 @@
                     }
                     if (res.ezf_field_type == 14) {
                         //file upload
-                         
+
                     }
                     if (res.ezf_field_type == 17) {
                         //all hospital list
-                        $('.field-sddynamicmodel-' + res.ezf_field_name).html('');
+                        var select2_bde525e5 = {
+                            "allowClear":true,
+                            "minimumInputLength":3,
+                            "ajax":{
+                                "url":__dirname + "./assets/ezfile/hospital.json",
+                                //"url":"\/ezforms\/hospital\/searchhospital",
+                                "dataType":"json",
+                                "data":function(params) {
+                                    console.log(params.term); 
+                                    return {q:params.term}; 
+                                },
+                                success:function(data){console.log(data.text);},
+                                
+                            },
+                            "escapeMarkup":function (markup) { 
+                                console.log(markup);
+                                return markup; 
+                            },
+                            "templateResult":function(result) { 
+                                console.log(result);
+                                 return result.text; 
+                            },
+                            "templateSelection":function (result) { 
+                                console.log(result);    
+                                 return result.text; 
+                            },
+                            "theme":"krajee",
+                            "width":"100%",
+                            "placeholder":"Search for hospital ...",
+                            "language":"en-US"
+                        };
+                        
+                        //$('.field-sddynamicmodel-' + res.ezf_field_name).html('');
                         knexRemote.knexfindById("ezform_fields", { ezf_field_id: res.ezf_field_id }).subscribe(
                             (res2) => {
+                                // let html = `
+                                //             <div class="form-group field-sddynamicmodel-var14">
+                                //                 <label class="control-label" for="sddynamicmodel-var14">Hospital list</label>
+                                //                 <select id="sddynamicmodel-${res2.ezf_field_name}" class="form-control" name="SDDynamicModel[var14]">
+                                //                    <option value='1'>sfs</option>
+                                //                    <option value='1'>sfs</option>
+                                //                    <option value='1'>sfs</option>
+                                //                 </select>
+                                //                 <p class="help-block help-block-error"></p>
+                                //             </div> 
+                                //         `;
+                                // $('.field-sddynamicmodel-' + res.ezf_field_name).html(html);
+                                //add select option
+ 
+                                jQuery.when(jQuery('#sddynamicmodel-'+ res2.ezf_field_name)
+                                .select2(select2_bde525e5))
+                                .done(initS2Loading('sddynamicmodel-'+ res2.ezf_field_name, 's2options_d6851687'));
 
-                                let label = res2.ezf_field_label;
-                                let html = `
-                                 
-                                    <div class="form-group field-sddynamicmodel-var14">
-                                        <label class="control-label" for="sddynamicmodel-var14">Hospital list</label>
-                                        <select onchange='GetAllHospital("sddynamicmodel-${res2.ezf_field_name}")' id="sddynamicmodel-${res2.ezf_field_name}" class="form-control" name="SDDynamicModel[var14]"></select>
-                                        <p class="help-block help-block-error"></p>
-                                    </div> 
-                                 `;
-                                $('.field-sddynamicmodel-' + res.ezf_field_name).html(html);
-                                knexRemote.knexfindAll("all_hospital_thai", 100).subscribe((res3) => {
-                                    $('#sddynamicmodel-' + res2.ezf_field_name).select2();
-                                    $("#sddynamicmodel-" + res2.ezf_field_name).append(`
-                                        <option value='${res3.hcode}'>${res3.name}</option>
-                                    `);
-
-                                }, err => console.log(err));
-
-                                $(document).on('keyup',".select2-search__field",function(){
-                                    let hcodes = $(this).val().toString();
-                                    let selects1 = "sddynamicmodel-"+res2.ezf_field_name;
-                                    GetAllHospital(selects1,hcodes);
+                                // // jQuery('#sddynamicmodel-'+ res2.ezf_field_name).on('change', function() { console.log('change = '+$(this).val()); });
+                                // $('#sddynamicmodel-' + res2.ezf_field_name).select2({
+                                //     //add select2
+                                //    placeholder: res2.ezf_field_label,
+                                //    theme:"bootstrap"
                                      
+                                // }); 
+
+
+                                $(document).on('keyup', ".select2-search__field", function () {
+                                    let hcodes = $(this).val().toString();
+                                    if (hcodes.length >= 4) {
+                                        let selects1 = "sddynamicmodel-" + res2.ezf_field_name;
+                                        GetAllHospital(selects1, hcodes);
+                                    }
+
+
                                 });
                             },
                             (err) => console.log(err)
@@ -239,14 +299,14 @@
                         //Google Maps
                         console.log("Google Maps");
                         let var_google_map = res2.ezf_field_name;
-                        knexRemote.knexfindById("ezform_fields", { ezf_field_sub_id: res.ezf_field_id }).subscribe((res2)=>{
+                        knexRemote.knexfindById("ezform_fields", { ezf_field_sub_id: res.ezf_field_id }).subscribe((res2) => {
                             console.log(res2.ezf_field_name);
                         });
-                         
+
                     }
-                    
-                    
-                    
+
+
+
                 });
 
             },
