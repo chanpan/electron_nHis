@@ -105,8 +105,31 @@
         $(".ezform-record").show();
 
     }
-    function GetAllHospital(selects = "", hcodes = "") {
+    function GetAllHospital(datas) {
+        alert(datas);
+        let data = [
+                    {
+                        "id": "10980",
+                        "text": "โรงพยาบาลแก้งคร้อ"
+                    },
+                    {
+                        "id": "00001",
+                        "text": "สำนักงานสาธารณสุขจังหวัดสมุทรปราการ"
+                    },
+                    {
+                        "id": "00002",
+                        "text": "สำนักงานสาธารณสุขจังหวัดนนทบุรี"
+                    }
+                ];
+        var fs = require("fs");
+        let fileName = __dirname+"./assets/ezfile/hospital.json";
+        fs.writeFile(fileName, JSON.stringify(data), function(err) {
+            if(err) {
+                return console.log(err);
+            }
 
+            console.log("The file was saved!");
+        }); 
         // let selects =$("#"+selects).val(); knex('users').where('columnName', 'like', '%rowlikeme%')
         //'select * from users where id in (?)', [[1, 2, 3]]
         // let url = __dirname + "./assets/ezfile/all_hospital_thai.json";
@@ -164,30 +187,46 @@
                     }
                     if (res.ezf_field_type == 17) {
                         //all hospital list
-                        var select2_bde525e5 = {
+                        var select2_hospitallist = {
                             "allowClear":true,
                             "minimumInputLength":3,
                             "ajax":{
                                 "url":__dirname + "./assets/ezfile/hospital.json",
-                                //"url":"\/ezforms\/hospital\/searchhospital",
                                 "dataType":"json",
+                                quietMillis: 100,
                                 "data":function(params) {
-                                    console.log(params.term); 
+                                    
+                                    GetAllHospital(params.term); 
                                     return {q:params.term}; 
                                 },
-                                success:function(data){console.log(data.text);},
+                                beforeSend:function(data){
+                                    console.log(data);
+                                },
+                                success:function(data){
+                                    console.log(data);
+                                },
+                                processResults: function (data) {
+                                    return {
+                                        results: $.map(data, function (item) {
+                                            return {
+                                                text: item.text,
+                                                id: item.id
+                                            }
+                                        })
+                                    };
+                                }
                                 
                             },
                             "escapeMarkup":function (markup) { 
-                                console.log(markup);
+                                //console.log(markup);
                                 return markup; 
                             },
                             "templateResult":function(result) { 
-                                console.log(result);
-                                 return result.text; 
+                                //console.log(result);
+                                return result.text; 
                             },
                             "templateSelection":function (result) { 
-                                console.log(result);    
+                                //console.log(result);    
                                  return result.text; 
                             },
                             "theme":"krajee",
@@ -214,7 +253,7 @@
                                 //add select option
  
                                 jQuery.when(jQuery('#sddynamicmodel-'+ res2.ezf_field_name)
-                                .select2(select2_bde525e5))
+                                .select2(select2_hospitallist))
                                 .done(initS2Loading('sddynamicmodel-'+ res2.ezf_field_name, 's2options_d6851687'));
 
                                 // // jQuery('#sddynamicmodel-'+ res2.ezf_field_name).on('change', function() { console.log('change = '+$(this).val()); });
@@ -230,7 +269,7 @@
                                     let hcodes = $(this).val().toString();
                                     if (hcodes.length >= 4) {
                                         let selects1 = "sddynamicmodel-" + res2.ezf_field_name;
-                                        GetAllHospital(selects1, hcodes);
+                                        //GetAllHospital(selects1, hcodes);
                                     }
 
 
@@ -298,7 +337,8 @@
                     if (res.ezf_field_type == 26) {
                         //Google Maps
                         console.log("Google Maps");
-                        let var_google_map = res2.ezf_field_name;
+                        let var_google_map = res.ezf_field_name;
+                        console.log(var_google_map);
                         knexRemote.knexfindById("ezform_fields", { ezf_field_sub_id: res.ezf_field_id }).subscribe((res2) => {
                             console.log(res2.ezf_field_name);
                         });
