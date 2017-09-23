@@ -1,6 +1,13 @@
 <br>
 <div class="panel panel-primary">
-    <div class="panel-heading"></div>
+    <div class="panel-heading">
+        <div class="row">
+            <div class="pull-right" style="margin-right:10px;">
+                <button class="btn btn-warning btn-lg"><i class="fa fa-refresh" aria-hidden="true"></i>
+                    Sync</button>
+            </div>
+        </div>
+    </div>
     <div class="panel-body">
         <table class="kv-grid-table table table-hover table-bordered table-striped table-condensed">
             <thead>
@@ -106,24 +113,9 @@
 
     }
     function GetAllHospital(datas) {
-        alert(datas);
-        let data = [
-                    {
-                        "id": "10980",
-                        "text": "โรงพยาบาลแก้งคร้อ"
-                    },
-                    {
-                        "id": "00001",
-                        "text": "สำนักงานสาธารณสุขจังหวัดสมุทรปราการ"
-                    },
-                    {
-                        "id": "00002",
-                        "text": "สำนักงานสาธารณสุขจังหวัดนนทบุรี"
-                    }
-                ];
         var fs = require("fs");
-        let fileName = __dirname+"./assets/ezfile/hospital.json";
-        fs.writeFile(fileName, JSON.stringify(data), function(err) {
+        let fileName = __dirname+"/assets/ezfile/hospitals.json";
+        fs.writeFile(fileName, JSON.stringify(datas), function(err) {
             if(err) {
                 return console.log(err);
             }
@@ -186,34 +178,30 @@
 
                     }
                     if (res.ezf_field_type == 17) {
+                       
                         //all hospital list
-                        var select2_hospitallist = {
+                        var select2_hospitallist1 = {
                             "allowClear":true,
                             "minimumInputLength":3,
                             "ajax":{
                                 "url":__dirname + "./assets/ezfile/hospital.json",
                                 "dataType":"json",
-                                quietMillis: 100,
+                                quietMillis: 3000,
                                 "data":function(params) {
                                     
-                                    GetAllHospital(params.term); 
+                                    //GetAllHospital(params.term); 
                                     return {q:params.term}; 
                                 },
-                                beforeSend:function(data){
-                                    console.log(data);
-                                },
-                                success:function(data){
-                                    console.log(data);
-                                },
                                 processResults: function (data) {
-                                    return {
-                                        results: $.map(data, function (item) {
-                                            return {
-                                                text: item.text,
-                                                id: item.id
-                                            }
-                                        })
-                                    };
+                                    console.log($(this).val());
+                                    // return {
+                                    //     results: $.map(data, function (item) {
+                                    //         return {
+                                    //             text: item.text,
+                                    //             id: item.id
+                                    //         }
+                                    //     })
+                                    // };
                                 }
                                 
                             },
@@ -250,8 +238,23 @@
                                 //             </div> 
                                 //         `;
                                 // $('.field-sddynamicmodel-' + res.ezf_field_name).html(html);
-                                //add select option
- 
+                                 
+                               // $("#sddynamicmodel-var14").append();
+                                $.ajax({
+                                    "url":__dirname + "./assets/ezfile/hospital.json",
+                                     dataType:'json',
+                                     success:function(ar){
+                                        let ars = JSON.stringify(ar);
+                                        let ar_options = "";
+                                        //console.log(JSON.parse(ars));
+                                        // for(let i in JSON.parse(ars)){
+                                        //     console.log(ars[i]);
+                                        //     //ar_options += "<option value='"+ar.id+"'>"+ar.text+"</option>";
+                                        // }
+                                        // $("#sddynamicmodel-var14").append(ar_options);
+                                     }
+                                });
+
                                 jQuery.when(jQuery('#sddynamicmodel-'+ res2.ezf_field_name)
                                 .select2(select2_hospitallist))
                                 .done(initS2Loading('sddynamicmodel-'+ res2.ezf_field_name, 's2options_d6851687'));
@@ -265,15 +268,15 @@
                                 // }); 
 
 
-                                $(document).on('keyup', ".select2-search__field", function () {
-                                    let hcodes = $(this).val().toString();
-                                    if (hcodes.length >= 4) {
-                                        let selects1 = "sddynamicmodel-" + res2.ezf_field_name;
-                                        //GetAllHospital(selects1, hcodes);
-                                    }
+                                // $(document).on('keyup', ".select2-search__field", function () {
+                                //     let hcodes = $(this).val().toString();
+                                //     if (hcodes.length >= 4) {
+                                //         let selects1 = "sddynamicmodel-" + res2.ezf_field_name;
+                                //         //GetAllHospital(selects1, hcodes);
+                                //     }
 
 
-                                });
+                                // });
                             },
                             (err) => console.log(err)
                         );
