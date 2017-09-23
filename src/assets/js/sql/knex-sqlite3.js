@@ -82,9 +82,17 @@ exports.knexUpdateColumToLocal = (table,data,primary) => {
   return knex(table).where(primary).update(data);
 }
 
-exports.knexfindAll = (table)=>{
+//////////////////////////////////////////////////// delete table =///////////////////////////////////////////////////////
+exports.knexDeleteColumToLocal = (table,wheres) => {
+  return knex(table).where(wheres).del();
+}
+
+exports.knexfindAll = (table,limit="")=>{
+  if(limit == ""){
+    limit = 100;
+  }
   return new Observable(ob => {
-    knex.select('*').from(table).map(row=>ob.next(row)).catch(err=>ob.error(err));
+    knex.select('*').from(table).limit(limit).map(row=>ob.next(row)).catch(err=>ob.error(err));
   });
 }
 

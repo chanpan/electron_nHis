@@ -28,11 +28,12 @@
 	require('rxjs/add/observable/of');
 	require('rxjs/add/operator/map');
 	setTimeout(function(){
-		$("#btnGetForm").trigger( "click" );
+		getEzformListAll();
+		//$("#btnGetForm").trigger( "click" );
 	},1000); 
 	function onInit(){
 		$('.ezform-list-search').select2();
-		setEzformToSelect2();
+		getEzformListAll();
 	}
 	function getFolders(){
 		return process.env.USERPROFILE+'\\Documents';
@@ -103,22 +104,14 @@
 		});  
 	}
 
-	function setEzformToSelect2(){
-		knexRemote01.knexfindAll('ezform_search').subscribe(
-			(res)=>{
-				let options = "";
-				options += "<option value='"+res.ezf_id+"'>"+res.ezf_name+"</option>";
-				$('.ezform-list-search').append(options);
-			},
-			(err)=>ezformSearchListShowDataError(err)
-			);
-	}
+	
 	function getEzformListAll(){
 		 
 		ezformClear();
+		 
 		knexRemote01.knexfindAll('ezform_search').subscribe(
 			(res)=>{
-				 
+				console.log(res); 
 				let html = "";
 				html += `
 				<a href="#" onclick='loadEzform("${res.ezf_id}")' class="list-group-item">
@@ -127,7 +120,9 @@
 				</a>
 				`;
 				 
-				 $("#app-ezform-list").append(html);
+				setTimeout(function(){
+					$("#app-ezform-list").append(html);
+				});
 				 
 			},
 			(err)=>ezformSearchListShowDataError(err)
@@ -173,6 +168,6 @@
 	}
 
 	onInit();
-	getEzformListAll();
+	
 </script>
 

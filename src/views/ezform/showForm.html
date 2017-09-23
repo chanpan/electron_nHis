@@ -33,8 +33,8 @@
                 <h1 id="panelTitle"></h1>
                 <hr style="border: 2px solid #333;">
                 <div>
-                    <input type="text" class="form-control" id="updateID">
-                    <input type="text" class="form-control" id="updateTABLE">
+                    <input type="hidden" class="form-control" id="updateID">
+                    <input type="hidden" class="form-control" id="updateTABLE">
                 </div>
                 <div id="Index2Ezform"></div>
                 <div id="Index2Ezbutton"></div>
@@ -101,6 +101,16 @@
         $(".ezform-record").show();
 
     }
+    function GetAllHospital(selects="", hcodes="") {
+         
+        // let selects =$("#"+selects).val();
+        knexRemote.knexfindById("all_hospital_thai", {hcode:hcodes}).subscribe((res3) => {
+            $("#"+selects).append(`
+              <option value='${res3.hcode}'>${res3.name}</option>
+            `);
+
+        }, err => console.log(err));
+    }
     function UpdateForm(ezf_id, table, id) {
         $("#updateID").val(id);
         $("#updateTABLE").val(table);
@@ -111,22 +121,122 @@
 
                 knexRemote.knexfindById("ezform_fields", { ezf_id: ezf_id }).subscribe((res) => {
                     var arr = [];
-                        for (var key in row) {
-                            if (row.hasOwnProperty(key)) {
-                                arr[key] = row[key]
-                            }
-                        };
-                    if (res.ezf_field_type == 1) {
-                        $("#sddynamicmodel-"+res.ezf_field_name).val(arr[res.ezf_field_name]); 
-                    }
-                    if(res.ezf_field_type == 23){
-                        var radios = $("#sddynamicmodel-"+res.ezf_field_name);
-                        console.log(radios);
-                            if(radios.is(':checked') === false) {
-                                radios.filter('[value='+arr[res.ezf_field_name]+']').prop('checked', true);
+                    for (var key in row) {
+                        if (row.hasOwnProperty(key)) {
+                            arr[key] = row[key]
                         }
+                    };
+
+                    if (res.ezf_field_type == 1 || res.ezf_field_type == 3 || res.ezf_field_type == 12 || res.ezf_field_type == 7 || res.ezf_field_type == 8 || res.ezf_field_type == 9) {
+                        if (res.ezf_field_type == 3) {
+                            $('.field-sddynamicmodel-' + res.ezf_field_name + ' .redactor-box .redactor-editor').append(arr[res.ezf_field_name]);
+                        }
+                        $("#sddynamicmodel-" + res.ezf_field_name).val(arr[res.ezf_field_name]);
                     }
-                })
+                    if (res.ezf_field_type == 4 || res.ezf_field_type == 16) {//radio single checkbox
+                        var radios = $("input[name='SDDynamicModel\\[" + res.ezf_field_name + "\\]']");//$("#sddynamicmodel-"+res2.ezf_field_name);
+                        radios.filter('[value=' + arr[res.ezf_field_name] + ']').prop('checked', true);
+                    }
+                    if (res.ezf_field_type == 14) {
+                        //file upload
+                        var formidable = require('formidable');
+                        if (req.url == './assets/image') {
+                            var form = new formidable.IncomingForm();
+                            form.parse(req, function (err, fields, files) {
+                                res.write('File uploaded');
+                                res.end();
+                            });
+                        } else { }
+                    }
+                    if (res.ezf_field_type == 17) {
+                        //all hospital list
+                        $('.field-sddynamicmodel-' + res.ezf_field_name).html('');
+                        knexRemote.knexfindById("ezform_fields", { ezf_field_id: res.ezf_field_id }).subscribe(
+                            (res2) => {
+
+                                let label = res2.ezf_field_label;
+                                let html = `
+                                 
+                                    <div class="form-group field-sddynamicmodel-var14">
+                                        <label class="control-label" for="sddynamicmodel-var14">Hospital list</label>
+                                        <select onchange='GetAllHospital("sddynamicmodel-${res2.ezf_field_name}")' id="sddynamicmodel-${res2.ezf_field_name}" class="form-control" name="SDDynamicModel[var14]"></select>
+                                        <p class="help-block help-block-error"></p>
+                                    </div> 
+                                 `;
+                                $('.field-sddynamicmodel-' + res.ezf_field_name).html(html);
+                                knexRemote.knexfindAll("all_hospital_thai", 100).subscribe((res3) => {
+                                    $('#sddynamicmodel-' + res2.ezf_field_name).select2();
+                                    $("#sddynamicmodel-" + res2.ezf_field_name).append(`
+                                        <option value='${res3.hcode}'>${res3.name}</option>
+                                    `);
+
+                                }, err => console.log(err));
+
+                                $(document).on('keyup',".select2-search__field",function(){
+                                    let hcodes = $(this).val().toString();
+                                    let selects1 = "sddynamicmodel-"+res2.ezf_field_name;
+                                    GetAllHospital(selects1,hcodes);
+                                     
+                                });
+                            },
+                            (err) => console.log(err)
+                        );
+                        //$('.field-sddynamicmodel-var14').html('');
+                    }
+                    if (res.ezf_field_type == 19) {//checkbox multi
+
+                        knexRemote.knexfindById("ezform_fields", { ezf_field_sub_id: res.ezf_field_id }).subscribe(
+                            (res2) => {
+                                var checkbox = $("input[name='SDDynamicModel\\[" + res2.ezf_field_name + "\\]']");
+                                checkbox.filter('[value=' + arr[res2.ezf_field_name] + ']').prop('checked', true);
+
+                            },
+                            (err) => console.log(err)
+                        );
+                    }
+                    if (res.ezf_field_type == 6)//dropdown
+                    {
+                        var theValue = $('#sddynamicmodel-' + res.ezf_field_name).val();
+                        $('option[value=' + arr[res.ezf_field_name] + ']').attr('selected', true);
+                    }
+
+
+                    if (res.ezf_field_type == 23) {//scale
+                        knexRemote.knexfindById("ezform_fields", { ezf_field_sub_id: res.ezf_field_id }).subscribe(
+                            (res2) => {
+                                //$("input[name='SDDynamicModel\\[var6r1\\]']").addClass('xxxxx');
+                                var radios = $("input[name='SDDynamicModel\\[" + res2.ezf_field_name + "\\]']");//$("#sddynamicmodel-"+res2.ezf_field_name);
+                                radios.filter('[value=' + arr[res2.ezf_field_name] + ']').prop('checked', true);
+
+                            },
+                            (err) => console.log(err)
+                        );
+                    }
+                    if (res.ezf_field_type == 25) {//Grid
+                        //ezf_field_sub_id
+                        knexRemote.knexfindById("ezform_fields", { ezf_field_sub_id: res.ezf_field_id }).subscribe(
+                            (res2) => {
+                                //console.log(res2.ezf_field_id);
+                                knexRemote.knexfindById("ezform_fields", { ezf_field_sub_id: res2.ezf_field_id }).subscribe(
+                                    (res3) => {
+                                        if (res3.ezf_field_type == "251" || res3.ezf_field_type == "252" || res3.ezf_field_type == "253") {
+                                            //text date textarea
+                                            $("#sddynamicmodel-" + res3.ezf_field_name).val(arr[res3.ezf_field_name]);
+                                        }
+                                        if (res3.ezf_field_type == "254") {//checkbox
+                                            var checkbox = $("input[name='SDDynamicModel\\[" + res3.ezf_field_name + "\\]']");
+                                            checkbox.filter('[value=' + arr[res3.ezf_field_name] + ']').prop('checked', true);
+                                        }
+
+
+                                    },
+                                    (err) => console.log(err)
+                                );
+                            },
+                            (err) => console.log(err)
+                        );
+                    }
+                });
 
             },
             (err) => { console.log(err) }
@@ -145,3 +255,43 @@
     }
 
 </script>
+
+<style>
+    input[type="radio"] {
+        cursor: pointer;
+        /* -webkit-appearance: none; */
+        appearance: none;
+        background: #34495E;
+        border-radius: 1px;
+        box-sizing: border-box;
+        position: relative;
+        box-sizing: content-box;
+        width: 16px;
+        height: 20px;
+        border-width: 0;
+        transition: all 0.3s linear;
+        margin-right: 10px;
+        position: relative;
+        top: 5px;
+    }
+
+    input[type="checkbox"] {
+        cursor: pointer;
+        /* -webkit-appearance: none; */
+        appearance: none;
+        background: #34495E;
+        border-radius: 1px;
+        box-sizing: border-box;
+        position: relative;
+        box-sizing: content-box;
+        width: 16px;
+        height: 20px;
+        border-width: 0;
+        transition: all 0.3s linear;
+        margin-right: 10px;
+        position: relative;
+        top: -4px;
+        /* right: 5px; */
+        /* margin-right: 10px; */
+    }
+</style>

@@ -41,9 +41,16 @@
 		}
 		function copyFile(target, src){
 			return new Observable(ob => {
-				var fs = require('fs');
-				fs.writeFileSync(target, fs.readFileSync(src));
-				ob.next("success");
+				fs.readFile(target,function(err, data){
+					if(err){
+						var fs = require('fs');
+						fs.writeFileSync(target, fs.readFileSync(src));
+						ob.next("สร้างไฟล์สำเร็จ");
+					}else{
+						ob.next("มีไฟล์อยู่แล้ว");
+					}
+				});
+				
 			});
 		}
 
@@ -55,7 +62,7 @@
 				console.log("Create folder ezforms success.");
 				copyFile(target,src).subscribe(
 					(res)=>{
-						console.log("Create file ezform.db success.");
+						console.log(res);
 						require(__dirname+"/assets/js/main.js");
 					},err=>console.log("error")
 					);
