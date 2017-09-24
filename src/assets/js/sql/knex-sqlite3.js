@@ -91,6 +91,10 @@ exports.knexfindAll = (table,limit="")=>{
   if(limit == ""){
     limit = 100;
   }
+  if(limit == "unlimit"){
+    limit = "";
+  }
+
   return new Observable(ob => {
     knex.select('*').from(table).limit(limit).map(row=>ob.next(row)).catch(err=>ob.error(err));
   });
@@ -118,7 +122,9 @@ exports.knexfindById2 = async (table,params)=>{
    
 }
 
-
+exports.GetCount = (table, wheres="*")=>{
+  return knex(table).count(wheres);
+}
 
 
 

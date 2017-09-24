@@ -12,8 +12,10 @@
 						<select class="ezform-list-search form-control" name="state">
 							<option value="">ค้นหา ezform</option>
 						</select>
-					</div><!-- /input-group -->
-				</div><!-- /.col-lg-6 -->
+					</div>
+					<!-- /input-group -->
+				</div>
+				<!-- /.col-lg-6 -->
 			</div>
 		</div>
 		<div id="app-ezform-list"></div>
@@ -22,95 +24,94 @@
 
 <div id="registerJsTmp"></div>
 <script>
-
 	let knexRemote01 = require('./assets/js/sql/knex-sqlite3.js');
 	var Observable = require('rxjs/Observable').Observable;
 	require('rxjs/add/observable/of');
 	require('rxjs/add/operator/map');
-	setTimeout(function(){
+	setTimeout(function () {
 		getEzformListAll();
 		//$("#btnGetForm").trigger( "click" );
-	},1000); 
-	function onInit(){
+	}, 1000);
+	function onInit() {
 		$('.ezform-list-search').select2();
 		getEzformListAll();
 	}
-	function getFolders(){
-		return process.env.USERPROFILE+'\\Documents';
+	function getFolders() {
+		return process.env.USERPROFILE + '\\Documents';
 	}
-	$(".ezform-list-search").on("change",function(){
+	$(".ezform-list-search").on("change", function () {
 		let ezf_id = $(this).val();
-		if(ezf_id != ""){
+		if (ezf_id != "") {
 			getEzformListByid(ezf_id);
-		}else{
+		} else {
 			getEzformListAll();
 		}
 	});
-	$("#btnGetForm").on("click",function(){
+	$("#btnGetForm").on("click", function () {
 		let ezf_id = $("#ezf_id").val();
-		 
-		getEzformById(ezf_id,1);
-		getEzformById(ezf_id,2);
-		getEzformById(ezf_id,3);
-		getEzformById(ezf_id,4);
+
+		getEzformById(ezf_id, 1);
+		getEzformById(ezf_id, 2);
+		getEzformById(ezf_id, 3);
+		getEzformById(ezf_id, 4);
 	});
 
-	function getEzformById(ezf_id, status){
-		let url="";//"http://dpmcloud.dev/site/ezform-print?comp_id_target=&ezf_id="+ezf_id+"&target=skip&dataid=0&status="+status;
-		url="https://www.thaicarecloud.org/site/ezform-print?comp_id_target=&ezf_id="+ezf_id+"&target=skip&dataid=0&status="+status;
+	function getEzformById(ezf_id, status) {
+		let url = "";//"http://dpmcloud.dev/site/ezform-print?comp_id_target=&ezf_id="+ezf_id+"&target=skip&dataid=0&status="+status;
+		url = "https://www.thaicarecloud.org/site/ezform-print?comp_id_target=&ezf_id=" + ezf_id + "&target=skip&dataid=0&status=" + status;
 		console.log(url);
 		$.ajax({
-			beforeSend:function(data){
+			beforeSend: function (data) {
 				$("#app-ezform-list").html("กำลังโหลดข้อมูล ...");
 			},
-			url:url,
-			success:function(data){
-				if(status == 1){
+			url: url,
+			success: function (data) {
+				if (status == 1) {
 					//Load resources from the server.
 					console.log("status = 1");
 					$("#registerJsTmp").html(data); //สั่งให้ script จาก server ทำงาน 
 				}
-				if(status == 2){
+				if (status == 2) {
 					//Load JavaScript from the server
 					console.log("status = 2");
-					
-					CreateFile(data, 'tbdata_'+ezf_id+"JS").subscribe(res=>console.log(res),err=>console.log(err));
+
+					CreateFile(data, 'tbdata_' + ezf_id + "JS").subscribe(res => console.log(res), err => console.log(err));
 				}
-				if(status == 3){
-					 
+				if (status == 3) {
+
 					//Load EzformField from the server
-					CreateFile(data, 'tbdata_'+ezf_id).subscribe(
-						res=>getEzformListAll(),err=>console.log(err));
+					CreateFile(data, 'tbdata_' + ezf_id).subscribe(
+						res => getEzformListAll(), err => console.log(err));
 					console.log("status = 3");
 				}
-				if(status == 4){
+				if (status == 4) {
 					//control button 
-					CreateFile(data, 'tbdata_'+ezf_id+"ControlBtn").subscribe(res=>console.log(res),err=>console.log(err));
-					 
+					CreateFile(data, 'tbdata_' + ezf_id + "ControlBtn").subscribe(res => console.log(res), err => console.log(err));
+
 				}
-				
+
 			}
 		});
 	}
 	/*create file */
-	function CreateFile(data, fileName){
+	function CreateFile(data, fileName) {
 		const fs = require("fs");
-		let pathName = getFolders()+"/ezforms/"+fileName+".html";
+		let pathName = getFolders() + "/ezforms/" + fileName + ".html";
 		return new Observable(ob => {
-			fs.writeFile(pathName,data, function(err){
-				if(err) ob.error(err)
-					ob.next("บันทึกไฟล์เรียบร้อย");            
-			});  
-		});  
+			fs.writeFile(pathName, data, function (err) {
+				if (err) ob.error(err)
+				ob.next("บันทึกไฟล์เรียบร้อย");
+			});
+		});
 	}
 
-	
-	function getEzformListAll(){
-		 
+
+	function getEzformListAll() {
+
 		ezformClear();
-		 
+
 		knexRemote01.knexfindAll('ezform_search').subscribe(
-			(res)=>{
+			(res) => {
 				//console.log(res); 
 				let html = "";
 				html += `
@@ -119,17 +120,17 @@
 					<p class="list-group-item-text">${res.ezf_id}</p>
 				</a>
 				`;
-				 
-				setTimeout(function(){
+
+				setTimeout(function () {
 					$("#app-ezform-list").append(html);
 				});
-				 
+
 			},
-			(err)=>ezformSearchListShowDataError(err)
-			);
+			(err) => ezformSearchListShowDataError(err)
+		);
 	}
 	// function getEzformListByid(ezf_id){
-		
+
 	// 	ezformClear();
 	// 	knexRemote01.knexfindById('ezform_search',{ezf_id:ezf_id}).subscribe(
 	// 		(res)=>{
@@ -145,24 +146,24 @@
 	// 		(err)=>ezformSearchListShowDataError(err)
 	// 		);
 	// }
-	function ezformSearchListShowDataError(err){
-		let msgs = "";	
+	function ezformSearchListShowDataError(err) {
+		let msgs = "";
 		msgs += "<div class='alert alert-danger'>";
 		msgs += err;
 		msgs += "</div>"
-		$('#app-ezform-list').html(msgs); 
+		$('#app-ezform-list').html(msgs);
 		$(selector).append(html);
 	}
-	function ezformClear(){
+	function ezformClear() {
 		$("#app-ezform-list").html("");
 	}
 
-	function loadEzform(ezf_id){
-		 
+	function loadEzform(ezf_id) {
+
 		const remote = require("electron").remote;
 		const main = remote.require('./main.js');
 		var window = remote.getCurrentWindow();
-		
+
 		main.childWindow(ezf_id);
 
 	}
@@ -170,66 +171,110 @@
 	onInit();
 
 	/*Sync*/
-    let sync = require("./assets/js/sync.js");
-    $("#btnSync").on("click", function () {
-        $("#btnSync i").addClass('fa-spin fa-fw');
+	var sync = require("./assets/js/sync.js");
+	$("#btnSync").on("click", function () {
+		$("#btnSync i").addClass('fa-spin fa-fw');
 
-        GetEzfTable($("#ezf_id").val());
-    });
-    function GetUrl(){
-        return "https://www.thaicarecloud.org/";
-    }
-    function GetEzfTable(ezf_id) {
-        var settings = {
-            "async": true,
-            "crossDomain": true,
-            "url": GetUrl()+"ezforms/ezform-service/get-ezform?ezf_id="+ezf_id,
-            "method": "GET",
-            "headers": {
-                "x-token": "549968af6006a2fe6c016bf9070b4899",
-            }
-        }
-        
-        $.ajax(settings).done(function (response) {
+		GetEzfTable($("#ezf_id").val());
+	});
+	function GetUrl() {
+		return "https://www.thaicarecloud.org/";
+	}
+	function GetEzfTable(ezf_id) {
+		var settings = {
+			"async": true,
+			"crossDomain": true,
+			"url": GetUrl() + "ezforms/ezform-service/get-ezform?ezf_id=" + ezf_id,
+			"method": "GET",
+			"headers": {
+				"x-token": "549968af6006a2fe6c016bf9070b4899",
+			}
+		}
+
+		$.ajax(settings).done(function (response) {
 			//console.log(response);
-           let table = response.ezfields[0].ezf_table;
-            //console.log(table);
-            sync.GetFielServer(table).subscribe((res)=>{
-				if(res.localField.length != res.serverField.length){
+			let table = response.ezfields[0].ezf_table;
+			//console.log(table);
+			sync.GetFielServer(table).subscribe((res) => {
+				if (res.localField.length != res.serverField.length) {
 					//field ไม่เท่ากัน
-					sync.CheckFieldInTable(res.localField,res.serverField).subscribe((fields)=>{
+					sync.CheckFieldInTable(res.localField, res.serverField).subscribe((fields) => {
 						console.log(fields);
 						sync.GetEzformFieldType();
-						sync.AlterNewField(table,fields).subscribe(res2=>{
+						sync.AlterNewField(table, fields).subscribe(res2 => {
 							//console.log(res2);
-							BtnRemoveClass();
+							SaveEzformTbdata(table, ezf_id);
+
 						});
 					});
-					
-				}else{
+
+				} else {
 					//alert(ezf_id);
 					sync.GetEzformFieldType(ezf_id);
-					BtnRemoveClass();
+					SaveEzformTbdata(table, ezf_id);
+					
+					//BtnRemoveClass();
 				}
-				getEzformById(ezf_id,1);
-				getEzformById(ezf_id,2);
-				getEzformById(ezf_id,3);
-				getEzformById(ezf_id,4);
+				getEzformById(ezf_id, 1);
+				getEzformById(ezf_id, 2);
+				getEzformById(ezf_id, 3);
+				getEzformById(ezf_id, 4);
 
 
-				
+
+
 			});
-        });
+		});
 	}
-function BtnRemoveClass(){
-	$("#btnSync i").removeClass('fa-spin fa-fw');
-}	
+	function BtnRemoveClass() {
+		$("#btnSync i").removeClass('fa-spin fa-fw');
+	}
+	function SaveTbData(table){
+		
+				sync.LoadTbDataAll(table).subscribe((response3) => {
+					let res3 = JSON.parse(response3);
+					for (let i in res3) {
+						//console.log(res3[i]);
+						knexRemote01.knexInsertColumToLocal(table, res3[i]).then((response4) => {
+							console.log("insert success.");
+							setTimeout(function(){
+								BtnRemoveClass();
+							},5000);
+						}).catch();
+					}
+				}, err => console.log(err));
+			 
+		
+	}
+	function SaveEzformTbdata(table, ezf_id) {
+		
+		knexRemote01.GetCount(table, "* as count").then((count) => {
+			if (count[0].count == 0) {
+				SaveTbData(table);
+			}
+		}).catch(err => console.log(err));
 
-function SaveEzformTbdata(table, ezf_id){
-	
-}
+		knexRemote01.knexfindAll(table, 9999999999).subscribe(
+			(row) => {
+		
+				sync.SaveEzform(ezf_id,row,"","10980","1435745159010041100",false, row.id).subscribe((response)=>{
+					
+					knexRemote01.knexDeleteColumToLocal(table, {id:row.id}).then((response2)=>{ 
+						knexRemote01.GetCount(table,"* as count").then((count)=>{
+							 
+							if(count[0].count == 0){
+								SaveTbData(table);
+							}
+						}).catch(err=>console.log(err));
+					}).catch(err=>console.log(err));
+				},err=>console.log(err));
+				 
+			},(err) => console.log(err));
+		
+		
+	}
+
 
 //save form
-	
-</script>
 
+</script>

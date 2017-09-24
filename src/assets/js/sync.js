@@ -117,37 +117,62 @@ exports.GetEzformFieldType = (ezf_id) => {
   function saveFieldsToLocalTableEzformSearch(table, data){
     syncKnex.knexInsertColumToLocal(table,data)
     .then(res=>console.log("Save "+table+" success"))
-    .catch(err=>console.log(err));
+    .catch(err=>console.log());
   }
 
 /* save and update form */
 exports.SaveEzform = (ezf_id="",data,target="",sitecode="",user_id="",submit=false, data_id="")=>{
     //"{\"var3\":\"ณัฐพล\",\"sys_lat\":11,\"sys_lng\":12}"
+    data['sys_lat']='11';
+    data['sys_lng']='12';
+    //console.log(data);
     var form = new FormData();
     form.append("ezf_id", ezf_id);
-    form.append("data", data);
+    form.append("data", JSON.stringify(data));
     form.append("target", target);
     form.append("sitecode", sitecode);
     form.append("user_id", user_id);
     form.append("submit", submit);
     form.append("data_id", data_id); //update
     
-    var settings = {
+    var settings2 = {
       "async": true,
       "crossDomain": true,
       "url": "https://www.thaicarecloud.org/api/v1/desktop-api/create-form",
       "method": "POST",
       "headers": {
-        "cache-control": "no-cache",
-        "postman-token": "65af2b19-a34e-bd84-ccfd-d1081f32f0da"
+        "x-token": "549968af6006a2fe6c016bf9070b4899",
       },
       "processData": false,
       "contentType": false,
       "mimeType": "multipart/form-data",
       "data": form
     }
-    
-    $.ajax(settings).done(function (response) {
-      console.log(response);
+    return new Observable(ob=>{
+        $.ajax(settings2).done(function (response) {
+            console.log(response);
+            ob.next(response);
+        });
     });
+    
+}
+
+exports.LoadTbDataAll=(table)=>{
+    var settings2 = {
+        "async": true,
+        "crossDomain": true,
+        "url": "https://www.thaicarecloud.org/api/v1/desktop-api/tb-data?ezf_id=1505970320082452600",
+        "method": "GET",
+        "headers": {
+          "x-token": "549968af6006a2fe6c016bf9070b4899",
+          "cache-control": "no-cache",
+          "postman-token": "2a4e2773-b834-41bf-ff68-73d834b634e3"
+        }
+      }
+      return new Observable(ob=>{
+        $.ajax(settings2).done(function (response) {
+            ob.next(response);
+          });
+      });
+      
 }
