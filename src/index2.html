@@ -115,6 +115,7 @@
 			return decodeURIComponent(window.location.search.replace(new RegExp("^(?:.*[&\\?]" + encodeURIComponent(key).replace(/[\.\+\*]/g, "\\$&") + "(?:\\=([^&]*))?)?.*$", "i"), "$1"));  
 		}
 		function getEzformName(ezf_id){
+			
 			knexRemote02.knexfindById("ezform_search",{ezf_id:ezf_id}).subscribe(
 				(res)=>{
 					$("#panelTitle").html(res.ezf_name);

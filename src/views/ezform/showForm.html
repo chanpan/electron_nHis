@@ -1,12 +1,7 @@
 <br>
 <div class="panel panel-primary">
     <div class="panel-heading">
-        <div class="row">
-            <div class="pull-right" style="margin-right:10px;">
-                <button class="btn btn-warning btn-lg"><i class="fa fa-refresh" aria-hidden="true"></i>
-                    Sync</button>
-            </div>
-        </div>
+       
     </div>
     <div class="panel-body">
         <table class="kv-grid-table table table-hover table-bordered table-striped table-condensed">
@@ -40,8 +35,8 @@
                 <h1 id="panelTitle"></h1>
                 <hr style="border: 2px solid #333;">
                 <div>
-                    <input type="text" class="form-control" id="updateID">
-                    <input type="text" class="form-control" id="updateTABLE">
+                    <input type="hidden" class="form-control" id="updateID">
+                    <input type="hidden" class="form-control" id="updateTABLE">
                 </div>
                 <div id="Index2Ezform"></div>
                 <div id="Index2Ezbutton"></div>
@@ -367,6 +362,10 @@
         var number = Math.round((Math.random() * 999999999));
         return number.toString().substr(0, 4);
     }
+
+
+
+    
 
 </script>
 

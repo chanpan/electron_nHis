@@ -25,7 +25,7 @@ app.on('window-all-closed', () => {
 exports.childWindow = function(ezf_id){
  child = new BrowserWindow({ 
   width:1024, height:600,
-  minWidth:768,
+  minWidth:1024,
   minHeight: 600,
   parent: mainWin, 
   modal: true,

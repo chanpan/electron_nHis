@@ -111,7 +111,7 @@
 		 
 		knexRemote01.knexfindAll('ezform_search').subscribe(
 			(res)=>{
-				console.log(res); 
+				//console.log(res); 
 				let html = "";
 				html += `
 				<a href="#" onclick='loadEzform("${res.ezf_id}")' class="list-group-item">
@@ -168,6 +168,68 @@
 	}
 
 	onInit();
+
+	/*Sync*/
+    let sync = require("./assets/js/sync.js");
+    $("#btnSync").on("click", function () {
+        $("#btnSync i").addClass('fa-spin fa-fw');
+
+        GetEzfTable($("#ezf_id").val());
+    });
+    function GetUrl(){
+        return "https://www.thaicarecloud.org/";
+    }
+    function GetEzfTable(ezf_id) {
+        var settings = {
+            "async": true,
+            "crossDomain": true,
+            "url": GetUrl()+"ezforms/ezform-service/get-ezform?ezf_id="+ezf_id,
+            "method": "GET",
+            "headers": {
+                "x-token": "549968af6006a2fe6c016bf9070b4899",
+            }
+        }
+        
+        $.ajax(settings).done(function (response) {
+			//console.log(response);
+           let table = response.ezfields[0].ezf_table;
+            //console.log(table);
+            sync.GetFielServer(table).subscribe((res)=>{
+				if(res.localField.length != res.serverField.length){
+					//field ไม่เท่ากัน
+					sync.CheckFieldInTable(res.localField,res.serverField).subscribe((fields)=>{
+						console.log(fields);
+						sync.GetEzformFieldType();
+						sync.AlterNewField(table,fields).subscribe(res2=>{
+							//console.log(res2);
+							BtnRemoveClass();
+						});
+					});
+					
+				}else{
+					//alert(ezf_id);
+					sync.GetEzformFieldType(ezf_id);
+					BtnRemoveClass();
+				}
+				getEzformById(ezf_id,1);
+				getEzformById(ezf_id,2);
+				getEzformById(ezf_id,3);
+				getEzformById(ezf_id,4);
+
+
+				
+			});
+        });
+	}
+function BtnRemoveClass(){
+	$("#btnSync i").removeClass('fa-spin fa-fw');
+}	
+
+function SaveEzformTbdata(table, ezf_id){
+	
+}
+
+//save form
 	
 </script>
 
