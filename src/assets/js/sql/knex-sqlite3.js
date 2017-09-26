@@ -122,10 +122,14 @@ exports.knexfindById2 = async (table,params)=>{
    
 }
 
-exports.GetCount = (table, wheres="*")=>{
-  return knex(table).count(wheres);
+exports.GetCount = (table, count="*")=>{
+  return knex(table).count(count).where();
 }
 
+
+exports.knexRaw = (sql)=>{
+  return knex.raw(sql);
+}//GetColumnSqlite3
 
 
 

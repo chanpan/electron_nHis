@@ -212,7 +212,7 @@
 					//alert(ezf_id);
 					sync.GetEzformFieldType(ezf_id);
 					SaveEzformTbdata(table, ezf_id);
-					
+
 					//BtnRemoveClass();
 				}
 				getEzformById(ezf_id, 1);
@@ -229,49 +229,59 @@
 	function BtnRemoveClass() {
 		$("#btnSync i").removeClass('fa-spin fa-fw');
 	}
-	function SaveTbData(table){
-		
-				sync.LoadTbDataAll(table).subscribe((response3) => {
-					let res3 = JSON.parse(response3);
-					for (let i in res3) {
-						//console.log(res3[i]);
-						knexRemote01.knexInsertColumToLocal(table, res3[i]).then((response4) => {
-							console.log("insert success.");
-							setTimeout(function(){
-								BtnRemoveClass();
-							},5000);
-						}).catch();
-					}
-				}, err => console.log(err));
-			 
-		
+	function SaveTbData(table) {
+
+		sync.LoadTbDataAll(table).subscribe((response3) => {
+			let res3 = JSON.parse(response3);
+			for (let i in res3) {
+				//console.log(res3[i]);
+				knexRemote01.knexInsertColumToLocal(table, res3[i]).then((response4) => {
+					console.log("insert success.");
+					setTimeout(function () {
+						BtnRemoveClass();
+					}, 5000);
+				}).catch((err) => {
+					setTimeout(function () {
+						BtnRemoveClass();
+					}, 5000);
+				});
+			}
+		}, err => console.log(err));
+
+
 	}
 	function SaveEzformTbdata(table, ezf_id) {
-		
+
 		knexRemote01.GetCount(table, "* as count").then((count) => {
 			if (count[0].count == 0) {
 				SaveTbData(table);
 			}
-		}).catch(err => console.log(err));
+		}).catch(err => {
+			setTimeout(function () {
+				BtnRemoveClass();
+				SaveTbData(table);
+			}, 5000);
+		});
 
 		knexRemote01.knexfindAll(table, 9999999999).subscribe(
 			(row) => {
-		
-				sync.SaveEzform(ezf_id,row,"","10980","1435745159010041100",false, row.id).subscribe((response)=>{
-					
-					knexRemote01.knexDeleteColumToLocal(table, {id:row.id}).then((response2)=>{ 
-						knexRemote01.GetCount(table,"* as count").then((count)=>{
-							 
-							if(count[0].count == 0){
+
+				sync.SaveEzform(ezf_id, row, "", "10980", "1435745159010041100", false, row.id).subscribe((response) => {
+
+					knexRemote01.knexDeleteColumToLocal(table, { id: row.id }).then((response2) => {
+						console.log(table);
+						knexRemote01.GetCount(table, " * as count").then((count) => {
+
+							if (count[0].count == 0) {
 								SaveTbData(table);
 							}
-						}).catch(err=>console.log(err));
-					}).catch(err=>console.log(err));
-				},err=>console.log(err));
-				 
-			},(err) => console.log(err));
-		
-		
+						}).catch(err => SaveTbData(table));
+					}).catch(err => console.log(err));
+				}, err => console.log(err));
+
+			}, (err) => console.log(err));
+
+
 	}
 
 

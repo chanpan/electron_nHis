@@ -33,7 +33,7 @@
 
 	<!-- JavaScript Core -->
 	<script>
-		window.$ = window.jQuery = require('./assets/js/jquery/jquery-2.1.4');
+		window.$ = window.jQuery = require('./assets/js/jquery/jquery-2.1.4.js');
 	</script>
  
  
@@ -93,6 +93,8 @@
 <script src="./assets/js/ezforms/js-gen-condition.js"></script>
 <script src="./assets/js/ezforms/yii.activeForm.js"></script>
 
+ 
+
 <!-- <link rel="stylesheet" href="./assets/select2/css/select2.min.css">
 <link rel="stylesheet" href="./assets/select2/css/select2-bootstrap.min.css">
 <script src="./assets/select2/js/select2.min.js"></script> -->
@@ -100,6 +102,13 @@
 </head>
 
 <body>
+	<!-- <style>
+	#map {
+		height: 400px;
+		width: 100%;
+	}
+	</style>
+	<div id="map">xxxxx</div> -->
 	<div class="container-fluid">
 		<div id="show-ezform"></div>
 	</div>
@@ -181,8 +190,19 @@
 		function getUserDoc() {
 			return process.env.USERPROFILE + '\\Documents';
 		}
-		
+		// function initMap() {
+		// 	var uluru = {lat: 16.4321938, lng: 102.8236214};
+		// 	var map = new google.maps.Map(document.getElementById('map'), {
+		// 	zoom: 15,
+		// 	center: uluru
+		// 	});
+		// 	var marker = new google.maps.Marker({
+		// 	position: uluru,
+		// 	map: map
+		// 	});
+		// }
 	</script>
+<!-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCxcfgo3QJTXSE_DCEKBKTFW9JcignBiws&callback=initMap" async defer></script> -->
 
 </body>
 

@@ -1,7 +1,7 @@
 <br>
 <div class="panel panel-primary">
     <div class="panel-heading">
-       
+
     </div>
     <div class="panel-body">
         <table class="kv-grid-table table table-hover table-bordered table-striped table-condensed">
@@ -109,14 +109,14 @@
     }
     function GetAllHospital(datas) {
         var fs = require("fs");
-        let fileName = __dirname+"/assets/ezfile/hospitals.json";
-        fs.writeFile(fileName, JSON.stringify(datas), function(err) {
-            if(err) {
+        let fileName = __dirname + "/assets/ezfile/hospitals.json";
+        fs.writeFile(fileName, JSON.stringify(datas), function (err) {
+            if (err) {
                 return console.log(err);
             }
 
             console.log("The file was saved!");
-        }); 
+        });
         // let selects =$("#"+selects).val(); knex('users').where('columnName', 'like', '%rowlikeme%')
         //'select * from users where id in (?)', [[1, 2, 3]]
         // let url = __dirname + "./assets/ezfile/all_hospital_thai.json";
@@ -173,105 +173,32 @@
 
                     }
                     if (res.ezf_field_type == 17) {
-                       
-                        //all hospital list
+
+                        var data = require("./assets/js/hospital.js");
+                        data.hospital = $.map(data.hospital, function (item) {
+                            return { id: item.id, text: item.id + " " + item.text };
+                        });
                         var select2_hospitallist1 = {
-                            "allowClear":true,
-                            "minimumInputLength":3,
-                            "ajax":{
-                                "url":__dirname + "./assets/ezfile/hospital.json",
-                                "dataType":"json",
-                                quietMillis: 3000,
-                                "data":function(params) {
-                                    
-                                    //GetAllHospital(params.term); 
-                                    return {q:params.term}; 
-                                },
-                                processResults: function (data) {
-                                    console.log($(this).val());
-                                    // return {
-                                    //     results: $.map(data, function (item) {
-                                    //         return {
-                                    //             text: item.text,
-                                    //             id: item.id
-                                    //         }
-                                    //     })
-                                    // };
-                                }
-                                
-                            },
-                            "escapeMarkup":function (markup) { 
-                                //console.log(markup);
-                                return markup; 
-                            },
-                            "templateResult":function(result) { 
-                                //console.log(result);
-                                return result.text; 
-                            },
-                            "templateSelection":function (result) { 
-                                //console.log(result);    
-                                 return result.text; 
-                            },
-                            "theme":"krajee",
-                            "width":"100%",
-                            "placeholder":"Search for hospital ...",
-                            "language":"en-US"
+                            "placeholder": 'Search for hospital ...',
+                            "quietMillis": 1500,
+                            "delay": 1500,
+                            "allowClear": true,
+                            "minimumInputLength": 5,
+                            "maximumSelectionSize": 10,
+                            "theme": "krajee",
+                            "width": "100%",
+                            "language": "en-US",
+                            "data": data.hospital
                         };
-                        
                         //$('.field-sddynamicmodel-' + res.ezf_field_name).html('');
                         knexRemote.knexfindById("ezform_fields", { ezf_field_id: res.ezf_field_id }).subscribe(
                             (res2) => {
-                                // let html = `
-                                //             <div class="form-group field-sddynamicmodel-var14">
-                                //                 <label class="control-label" for="sddynamicmodel-var14">Hospital list</label>
-                                //                 <select id="sddynamicmodel-${res2.ezf_field_name}" class="form-control" name="SDDynamicModel[var14]">
-                                //                    <option value='1'>sfs</option>
-                                //                    <option value='1'>sfs</option>
-                                //                    <option value='1'>sfs</option>
-                                //                 </select>
-                                //                 <p class="help-block help-block-error"></p>
-                                //             </div> 
-                                //         `;
-                                // $('.field-sddynamicmodel-' + res.ezf_field_name).html(html);
-                                 
-                               // $("#sddynamicmodel-var14").append();
-                                $.ajax({
-                                    "url":__dirname + "./assets/ezfile/hospital.json",
-                                     dataType:'json',
-                                     success:function(ar){
-                                        let ars = JSON.stringify(ar);
-                                        let ar_options = "";
-                                        //console.log(JSON.parse(ars));
-                                        // for(let i in JSON.parse(ars)){
-                                        //     console.log(ars[i]);
-                                        //     //ar_options += "<option value='"+ar.id+"'>"+ar.text+"</option>";
-                                        // }
-                                        // $("#sddynamicmodel-var14").append(ar_options);
-                                     }
-                                });
 
-                                jQuery.when(jQuery('#sddynamicmodel-'+ res2.ezf_field_name)
-                                .select2(select2_hospitallist))
-                                .done(initS2Loading('sddynamicmodel-'+ res2.ezf_field_name, 's2options_d6851687'));
-
-                                // // jQuery('#sddynamicmodel-'+ res2.ezf_field_name).on('change', function() { console.log('change = '+$(this).val()); });
-                                // $('#sddynamicmodel-' + res2.ezf_field_name).select2({
-                                //     //add select2
-                                //    placeholder: res2.ezf_field_label,
-                                //    theme:"bootstrap"
-                                     
-                                // }); 
+                                jQuery.when(jQuery('#sddynamicmodel-' + res2.ezf_field_name)
+                                    .select2(select2_hospitallist1))
+                                    .done(initS2Loading('sddynamicmodel-' + res2.ezf_field_name, 's2options_d6851687'));
 
 
-                                // $(document).on('keyup', ".select2-search__field", function () {
-                                //     let hcodes = $(this).val().toString();
-                                //     if (hcodes.length >= 4) {
-                                //         let selects1 = "sddynamicmodel-" + res2.ezf_field_name;
-                                //         //GetAllHospital(selects1, hcodes);
-                                //     }
-
-
-                                // });
                             },
                             (err) => console.log(err)
                         );
@@ -332,14 +259,212 @@
                         );
                     }//grid
 
+                    let province = [];
+                    if (res.ezf_field_type == 13) {//Province Amphut ...
+
+                        let ProvinceOptions = '<option></option>';
+                        let AmphurOptions = '';
+                        let ThumbonOptions = '';
+                        let arr1 = [];
+                        $('.field-sddynamicmodel-syscheck').replaceWith(`<div id='PROVINCE'></div>`);
+                        knexRemote.knexRaw("SELECT * FROM ezform_fields WHERE ezf_field_sub_id = '" + res.ezf_field_id + "' ")
+                            .then((res3) => {
+
+                                for (let i in res3) {
+                                    arr1.push(res3[i].ezf_field_name);
+                                }
+                                setTimeout(function () {
+                                    //console.log(res.ezf_field_name);
+                                    knexRemote.knexfindById('const_province', { PROVINCE_ID: arr[arr1[0]] }).subscribe((next) => {
+                                        $(`#${arr1[0]}`).html(`<option value='${next.PROVINCE_ID}'>${next.PROVINCE_NAME}</option>`);
+                                        getProvince(ProvinceOptions, arr1);
+                                    });
+                                    knexRemote.knexfindById('const_amphur', { AMPHUR_ID: arr[arr1[1]] }).subscribe((next) => {
+                                        $(`#${arr1[1]}`).html(`<option value='${next.AMPHUR_ID}'>${next.AMPHUR_NAME}</option>`);
+                                        getAmphur(AmphurOptions, arr1);
+                                    });
+                                    knexRemote.knexfindById('const_district', { DISTRICT_ID: arr[arr1[2]] }).subscribe((next) => {
+                                        $(`#${arr1[2]}`).html(`<option value='${next.DISTRICT_ID}'>${next.DISTRICT_NAME}</option>`);
+                                        getDistrict(ThumbonOptions, arr1);
+                                    });
+                                }, 1100);
+                                //console.log(arr);
+                                setTimeout(function () {
+                                    $('#PROVINCE').append(`
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <label>จังหวัด</label>
+                                        <select class="form-control" id="${arr1[0]}" name="SDDynamicModel[${arr1[0]}]"></select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label>อำเภอ</label>
+                                        <select class="form-control" id="${arr1[1]}" name="SDDynamicModel[${arr1[1]}]"></select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label>ตำบล</label>
+                                        <select class="form-control" id="${arr1[2]}" name="SDDynamicModel[${arr1[2]}]"></select>
+                                    </div>     
+                                </div>
+                            `);
+
+                                    knexRemote.knexfindAll('const_province', 78).subscribe((next) => {
+                                        ProvinceOptions += `<option value='${next.PROVINCE_ID}'>${next.PROVINCE_NAME}</option>`;
+                                        $(`#${arr1[0]}`).append(ProvinceOptions);
+                                    });
+                                    $(`#${arr1[0]}`).on("change", function () {
+                                        let id = $(this).val();
+                                        //console.log(arr[1]);
+                                        AmphurOptions = '';
+                                        AmphurOptions = '<option></option>';
+                                        knexRemote.knexfindById('const_amphur', { PROVINCE_ID: id }).subscribe((next2) => {
+                                            //console.log(next2);
+                                            AmphurOptions += `<option value='${next2.AMPHUR_ID}'>${next2.AMPHUR_NAME}</option>`;
+                                            $(`#${arr1[1]}`).html(AmphurOptions);
+                                        });
+                                        var select2_amphur = {
+                                            "placeholder": 'เลือกอำเภอ ...',
+                                            "allowClear": true,
+                                            //"minimumInputLength": 3,
+                                            "theme": "krajee",
+                                            "width": "100%",
+                                            "language": "en-US",
+                                        };
+                                        jQuery.when(jQuery(`#${arr1[1]}`)
+                                            .select2(select2_amphur))
+                                            .done(initS2Loading(`${arr1[1]}`, 's2options_d6851687'));
+
+
+                                    });
+                                    $(`#${arr1[1]}`).on("change", function () {
+                                        let id = $(this).val();
+                                        //console.log(arr[1]);
+                                        ThumbonOptions = '';
+                                        ThumbonOptions = '<option></option>';
+                                        knexRemote.knexfindById('const_district', { AMPHUR_ID: id }).subscribe((next3) => {
+                                            //console.log(next2);
+                                            ThumbonOptions += `<option value='${next3.DISTRICT_ID}'>${next3.DISTRICT_NAME}</option>`;
+                                            $(`#${arr1[2]}`).html(ThumbonOptions);
+                                        });
+                                        var select2_thumbon = {
+                                            "placeholder": 'เลือกตำบล ...',
+                                            "allowClear": true,
+                                            //"minimumInputLength": 3,
+                                            "theme": "krajee",
+                                            "width": "100%",
+                                            "language": "en-US",
+                                        };
+                                        jQuery.when(jQuery(`#${arr1[2]}`)
+                                            .select2(select2_thumbon))
+                                            .done(initS2Loading(`${arr1[2]}`, 's2options_d6851687'));
+                                    });
+                                    var select2_province = {
+                                        "placeholder": 'เลือกจังหวัด ...',
+                                        "allowClear": true,
+                                        //"minimumInputLength": 3,
+                                        "theme": "krajee",
+                                        "width": "100%",
+                                        "language": "en-US",
+
+                                    };
+                                    jQuery.when(jQuery(`#${arr1[0]}`)
+                                        .select2(select2_province))
+                                        .done(initS2Loading(`${arr1[0]}`, 's2options_d6851687'));
+                                }, 1000);
+
+
+
+
+
+                            }).catch();
+
+                    }
+
                     if (res.ezf_field_type == 26) {
                         //Google Maps
-                        console.log("Google Maps");
+                        //console.log("Google Maps");
                         let var_google_map = res.ezf_field_name;
-                        console.log(var_google_map);
+                        //console.log(var_google_map);
                         knexRemote.knexfindById("ezform_fields", { ezf_field_sub_id: res.ezf_field_id }).subscribe((res2) => {
-                            console.log(res2.ezf_field_name);
+                            //console.log(res2.ezf_field_name);
                         });
+
+                    }
+                    if (res.ezf_field_type == 27) {
+                        //icd9
+
+                        var data = require("./assets/js/icd9.js");
+
+                        data.icd9 = $.map(data.icd9, function (item) {
+                            return { id: item.code, text: item.code + " " + item.name };
+                        });
+                        var select2_hospitallistICD9 = {
+                            "placeholder": 'Search for ICD9 ...',
+                            //"quietMillis": 1500,
+                            //"delay": 1500,
+                            "allowClear": true,
+                            "minimumInputLength": 1,
+                            "theme": "krajee",
+                            "width": "100%",
+                            "language": "en-US",
+                            "data": data.icd9,
+                        };
+
+
+                        $("#sddynamicmodel-" + res.ezf_field_name).show();
+                        jQuery.when(jQuery('#sddynamicmodel-' + res.ezf_field_name)
+                            .select2(select2_hospitallistICD9))
+                            .done(initS2Loading('sddynamicmodel-' + res.ezf_field_name, 's2options_d6851687'));
+                        //console.log(arr[res.ezf_field_name]);
+                        let id = '';
+                        let name = '';
+                        for (let i of data.icd9) {
+                            if (i.id == arr[res.ezf_field_name]) {
+                                id = i.id;
+                                name = i.id + " " + i.text;
+                            }
+                        }
+
+                        let values = `<option value="${id}" selected>${name}</option>`;
+                        $('#sddynamicmodel-' + res.ezf_field_name).append(values);
+
+                    }
+                    if (res.ezf_field_type == 28) {
+                        //icd10
+
+                        var data = require("./assets/js/icd10.js");
+                        data.icd10 = $.map(data.icd10, function (item) {
+                            return { id: item.code, text: item.code + " " + item.name };
+                        });
+
+                        var select2_hospitallistICD10 = {
+                            "placeholder": 'Search for ICD10 ...',
+                            "allowClear": true,
+                            "minimumInputLength": 3,
+                            "maximumSelectionSize": 10,
+                            "width": "100%",
+                            "language": "en-US",
+                            "data": data.icd10,
+                            "theme": "krajee",
+                        };
+
+                        $("#sddynamicmodel-" + res.ezf_field_name).show();
+                        jQuery.when(jQuery('#sddynamicmodel-' + res.ezf_field_name)
+                            .select2(select2_hospitallistICD10))
+                            .done(initS2Loading('sddynamicmodel-' + res.ezf_field_name, 's2options_d6851687'));
+
+
+                        // let id='';
+                        // let name='';
+                        // for(let i of data.icd10){
+                        //     if(i.id == arr[res.ezf_field_name]){
+                        //         id = i.id;
+                        //         name = i.id+" "+i.text; 
+                        //     }
+                        // }
+
+                        // let values = `<option value="${id}" selected>${name}</option>`;
+                        // $('#sddynamicmodel-'+res.ezf_field_name).append(values);
+
 
                     }
 
@@ -353,6 +478,43 @@
 
 
     }
+
+    function getProvince(ProvinceOptions, arr1) {
+        knexRemote.knexfindAll('const_province', 78).subscribe((next) => {
+            ProvinceOptions += `<option value='${next.PROVINCE_ID}'>${next.PROVINCE_NAME}</option>`;
+            $(`#${arr1[0]}`).append(ProvinceOptions);
+        });
+    }
+    function getAmphur(AmphurOptions, arr1) {
+        AmphurOptions = '';
+        AmphurOptions = '<option></option>';
+        knexRemote.knexfindById('const_amphur', { PROVINCE_ID: id }).subscribe((next2) => {
+            //console.log(next2);
+            AmphurOptions += `<option value='${next2.AMPHUR_ID}'>${next2.AMPHUR_NAME}</option>`;
+            $(`#${arr1[1]}`).html(AmphurOptions);
+        });
+    }
+    function getDistrict(ThumbonOptions, arr1) {
+        ThumbonOptions = '';
+        ThumbonOptions = '<option></option>';
+        knexRemote.knexfindById('const_district', { AMPHUR_ID: id }).subscribe((next3) => {
+            //console.log(next2);
+            ThumbonOptions += `<option value='${next3.DISTRICT_ID}'>${next3.DISTRICT_NAME}</option>`;
+            $(`#${arr1[2]}`).html(ThumbonOptions);
+        });
+        var select2_thumbon = {
+            "placeholder": 'เลือกตำบล ...',
+            "allowClear": true,
+            //"minimumInputLength": 3,
+            "theme": "krajee",
+            "width": "100%",
+            "language": "en-US",
+        };
+        jQuery.when(jQuery(`#${arr1[2]}`)
+            .select2(select2_thumbon))
+            .done(initS2Loading(`${arr1[2]}`, 's2options_d6851687'));
+    }
+
     function myID() {
         var n = Date.now();
         let val = n * 1000;
@@ -362,10 +524,6 @@
         var number = Math.round((Math.random() * 999999999));
         return number.toString().substr(0, 4);
     }
-
-
-
-    
 
 </script>
 
